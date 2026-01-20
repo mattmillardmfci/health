@@ -155,6 +155,8 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 		if (!currentUser.quests || currentUser.quests.length === 0) {
 			const newQuests = generateQuests(currentUser.id);
 			setQuests(newQuests);
+			// Save generated quests to user
+			updateUser({ ...currentUser, quests: newQuests });
 		} else {
 			setQuests(currentUser.quests);
 		}

@@ -56,7 +56,71 @@ export const CompanionHub: React.FC<{
 				createdAt: new Date(),
 			};
 
-			const updated = { ...currentUser, companion: newCompanion, quests: [] };
+			// Generate initial quests using the same logic as QuestBoard
+			const today = new Date();
+			const tomorrow = new Date(today);
+			tomorrow.setDate(tomorrow.getDate() + 1);
+			
+			const initialQuests = [
+				{
+					id: "daily-meal-1",
+					userId: currentUser.id,
+					title: "Nutritious Feast",
+					description: "Log 3 meals today",
+					type: "daily" as const,
+					linkedActivity: "meal" as const,
+					targetCount: 3,
+					currentProgress: 0,
+					rewardPoints: 30,
+					rewardXP: 50,
+					completed: false,
+					expiresAt: tomorrow,
+				},
+				{
+					id: "daily-activity-1",
+					userId: currentUser.id,
+					title: "Let's Move!",
+					description: "Log an activity session",
+					type: "daily" as const,
+					linkedActivity: "activity" as const,
+					targetCount: 1,
+					currentProgress: 0,
+					rewardPoints: 25,
+					rewardXP: 40,
+					completed: false,
+					expiresAt: tomorrow,
+				},
+				{
+					id: "daily-journal-1",
+					userId: currentUser.id,
+					title: "Share Your Thoughts",
+					description: "Write a journal entry",
+					type: "daily" as const,
+					linkedActivity: "journal" as const,
+					targetCount: 1,
+					currentProgress: 0,
+					rewardPoints: 20,
+					rewardXP: 35,
+					completed: false,
+					expiresAt: tomorrow,
+				},
+				{
+					id: "daily-weight-1",
+					userId: currentUser.id,
+					title: "Check In",
+					description: "Log your weight",
+					type: "daily" as const,
+					linkedActivity: "weight" as const,
+					targetCount: 1,
+					currentProgress: 0,
+					rewardPoints: 15,
+					rewardXP: 25,
+					completed: false,
+					expiresAt: tomorrow,
+				},
+			];
+
+			const updated = { ...currentUser, companion: newCompanion, quests: initialQuests };
 			updateUser(updated);
 		}
 	}, [currentUser, updateUser]);
