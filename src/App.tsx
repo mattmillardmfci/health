@@ -33,8 +33,20 @@ type ViewType =
 
 function AppContent() {
 	const { users, currentUser, setCurrentUser } = useUsers();
-	const [view, setView] = useState<ViewType>(!currentUser ? "setup" : "results");
+	// Initialize view from localStorage or based on currentUser
+	const [view, setView] = useState<ViewType>(() => {
+		if (!currentUser) return "setup";
+		const savedView = localStorage.getItem("lastView") as ViewType | null;
+		return savedView && savedView !== "setup" ? savedView : "home";
+	});
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+	// Save view to localStorage when it changes
+	React.useEffect(() => {
+		if (currentUser) {
+			localStorage.setItem("lastView", view);
+		}
+	}, [view, currentUser]);
 
 	// Scroll to top when navigating
 	React.useEffect(() => {
@@ -139,12 +151,12 @@ function AppContent() {
 							</button>
 						</div>
 						<div className="flex justify-center">
-						<UserProfileForm
-						onProfileCreated={() => {
-							setView("home");
-							window.scrollTo(0, 0);
-						}}
-					/>
+							<UserProfileForm
+								onProfileCreated={() => {
+									setView("home");
+									window.scrollTo(0, 0);
+								}}
+							/>
 						</div>
 					</>
 				) : !currentUser ? (

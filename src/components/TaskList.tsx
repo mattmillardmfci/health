@@ -58,10 +58,12 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 		});
 	};
 
-	// Filter tasks for display - only recurring tasks or uncompleted today
+	// Filter tasks for display - only show tasks not completed today, exclude progression chain tasks
 	const getTasksForToday = (category: "morning" | "anytime" | "special") => {
 		return tasks.filter((t) => {
 			if (t.category !== category) return false;
+			// Exclude progression chain tasks from display
+			if (t.progressionChainId) return false;
 			// Check if task is recurring
 			if (t.isRecurring) {
 				// If it was completed today, don't show it
