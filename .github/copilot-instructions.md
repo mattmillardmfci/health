@@ -15,7 +15,16 @@ LifeCoach Pro is a scientific React + TypeScript webapp for personal life coachi
 2. **Scientific calculations** - Mifflin-St Jeor BMR, TDEE with activity multipliers
 3. **Macro planning** - Protein-first approach for weight loss
 4. **Extreme cutting support** - Supplement stacks, refeed scheduling, harm reduction
-5. **Responsive design** - Works as website and mobile app
+5. **Gamification with Polar Bear Companion**:
+   - Level up your polar bear by completing tasks
+   - Track daily checkpoints and streaks
+   - Companion evolves through stages (cub → juvenile → adolescent → adult)
+6. **Persistent Task System**:
+   - Morning routines auto-reset daily
+   - Anytime task progression chains (e.g., "Do 10 pushups" → "Do 20 pushups")
+   - Daily checkpoint showing today's progress
+   - Task-based quests that unlock bigger rewards
+7. **Responsive design** - Works as website and mobile app
 
 ## Development Commands
 
@@ -42,11 +51,80 @@ src/
 │   └── index.ts                 - TypeScript definitions
 ├── utils/
 │   ├── nutritionCalculations.ts - BMR/TDEE/macro math
-│   └── coachingEngine.ts        - Coaching advice generation
+│   ├── coachingEngine.ts        - Coaching advice generation
+│   └── taskUtils.ts             - Task XP and quest logic
 ├── App.tsx                       - Main app
 ├── index.css                     - Tailwind directives
 └── main.tsx                      - Entry point
 ```
+
+## Task System Architecture
+
+### Persistent Tasks
+Tasks support recurring functionality (auto-resets daily):
+- **Morning Routines**: Reset each day, track daily completion streaks
+- **Anytime Tasks**: Can be added anytime, progress tracked per day
+- **Task Properties**: 
+  - `isRecurring`: Whether task repeats daily
+  - `progressionValue`: Starting rep count for chains (e.g., 10 for "Do 10 pushups")
+  - `completedDate`: Last date task was marked complete
+  - `dailyStreak`: Consecutive days completed
+  - `reward`: XP awarded to companion (base 10, +5 per progression step)
+
+### Progression Task Chains
+When a task with `progressionValue` is completed, a new task is automatically created:
+- **Example**: Complete "Do 10 pushups" → Creates "Do 20 pushups (10/20)" next
+- **Bonus XP**: Progression tasks award +5 XP above base reward
+- **Chain ID**: Tracks parent task for progression context
+
+### Daily Checkpoint
+Tasks show daily progress:
+- "Morning Routines: 3 of 5 completed today"
+- "Anytime Tasks: 2 of 8 completed today"
+- Auto-resets at midnight based on `completedDate`
+
+### Task-Based Quests
+Three types of task quests track companion progression:
+
+1. **Morning Champion** (Daily)
+   - Complete 5 morning routine tasks
+   - Reward: 50 points, 75 XP
+   - Expires: Tomorrow at midnight
+
+2. **Progressive Warrior** (Weekly)
+   - Complete a progression chain (3 steps: 10→20→40)
+   - Reward: 100 points, 150 XP
+   - Expires: 7 days
+
+3. **Task Master** (Daily)
+   - Complete 10 anytime tasks
+   - Reward: 75 points, 120 XP
+   - Expires: Tomorrow at midnight
+
+### Companion XP System
+- Tasks award XP directly to companion on completion
+- Base reward: 10 XP + task's reward value
+- Progression bonus: +5 XP extra per chain step
+- Level-up formula: 100 × current_level XP needed
+- Evolution: Unlocks at levels 5 (juvenile), 10 (adolescent), 20 (adult)
+
+### Task Utility Functions
+
+**awardXpToCompanion(companion, xpAmount)**
+- Adds XP and checks for level-ups
+- Auto-promotes companion stage at thresholds
+- Caps happiness at 100, increases by 5 per task
+
+**checkTaskQuests(user, completedTaskId, newTaskCreated)**
+- Evaluates task-chain quests
+- Counts daily task completions by category
+- Detects progression chains automatically
+- Returns updated quests and completed IDs
+
+**generateTaskQuests(userId)**
+- Creates initial 3 task-based quests
+- Sets up proper expiration dates
+- Uses current user's timezone
 
 ## Scientific Basis
 
