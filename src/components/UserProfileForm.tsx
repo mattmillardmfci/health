@@ -1,0 +1,197 @@
+import React, { useState } from "react";
+import type { User, Gender } from "../types";
+import { useUsers } from "../hooks/useUsers";
+
+export const UserProfileForm: React.FC = () => {
+	const { addUser, currentUser, updateUser } = useUsers();
+	const [formData, setFormData] = useState<Partial<User>>(
+		currentUser || {
+			name: "",
+			gender: "male" as Gender,
+			age: 25,
+			weight: 180,
+			height: 70,
+			activityLevel: "moderately_active",
+			goal: "lose_weight",
+			weeklyWeightLossTarget: 1.5,
+			dietaryRestrictions: [],
+			medicalConditions: [],
+		},
+	);
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+
+		const user: User = {
+			id: currentUser?.id || Date.now().toString(),
+			name: formData.name || "User",
+			gender: formData.gender as Gender,
+			age: formData.age || 25,
+			weight: formData.weight || 180,
+			height: formData.height || 70,
+			activityLevel: formData.activityLevel as User["activityLevel"],
+			goal: formData.goal as User["goal"],
+			weeklyWeightLossTarget: formData.weeklyWeightLossTarget || 1,
+			dietaryRestrictions: formData.dietaryRestrictions || [],
+			medicalConditions: formData.medicalConditions || [],
+			createdAt: currentUser?.createdAt || new Date(),
+			updatedAt: new Date(),
+		};
+
+		if (currentUser) {
+			updateUser(user);
+		} else {
+			addUser(user);
+		}
+	};
+
+	return (
+		<div className="w-full max-w-2xl mx-auto px-4">
+			<div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-blue-100">
+				<h2 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+					{currentUser ? "Update Your Profile" : "Create Your Profile"}
+				</h2>
+				<p className="text-gray-600 mb-8 text-sm sm:text-base">
+					Fill in your details to get personalized nutrition recommendations
+				</p>
+
+				<form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+						{/* Name */}
+						<div className="sm:col-span-2">
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Name</label>
+							<input
+								type="text"
+								name="name"
+								value={formData.name || ""}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base placeholder-gray-400"
+								placeholder="Your name"
+								required
+							/>
+						</div>
+
+						{/* Gender */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Gender</label>
+							<select
+								name="gender"
+								value={formData.gender || "male"}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</div>
+
+						{/* Age */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Age (years)</label>
+							<input
+								type="number"
+								name="age"
+								value={formData.age ?? ""}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+								min="13"
+								max="120"
+							/>
+						</div>
+
+						{/* Weight */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Weight (lbs)</label>
+							<input
+								type="number"
+								name="weight"
+								value={formData.weight ?? ""}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+								min="50"
+								max="500"
+								step="0.5"
+							/>
+						</div>
+
+						{/* Height */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Height (inches)</label>
+							<input
+								type="number"
+								name="height"
+								value={formData.height ?? ""}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+								min="48"
+								max="96"
+								step="0.5"
+							/>
+						</div>
+
+						{/* Activity Level */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Activity Level</label>
+							<select
+								name="activityLevel"
+								value={formData.activityLevel || "moderately_active"}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+								<option value="sedentary">Sedentary (little/no exercise)</option>
+								<option value="lightly_active">Lightly Active (1-3 days/week)</option>
+								<option value="moderately_active">Moderately Active (3-5 days/week)</option>
+								<option value="very_active">Very Active (6-7 days/week)</option>
+								<option value="extremely_active">Extremely Active (2x per day)</option>
+							</select>
+						</div>
+
+						{/* Goal */}
+						<div>
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Primary Goal</label>
+							<select
+								name="goal"
+								value={formData.goal || "lose_weight"}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+								<option value="lose_weight">Lose Weight</option>
+								<option value="maintain">Maintain Weight</option>
+								<option value="gain_weight">Gain Weight</option>
+							</select>
+						</div>
+
+						{/* Weekly Weight Loss Target */}
+						<div className="sm:col-span-2">
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+								Weekly Weight Loss Target
+							</label>
+							<select
+								name="weeklyWeightLossTarget"
+								value={formData.weeklyWeightLossTarget || 1.5}
+								onChange={handleInputChange}
+								className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+								<option value="0.5">0.5 lbs/week (Conservative)</option>
+								<option value="1">1 lbs/week (Moderate)</option>
+								<option value="1.5">1.5 lbs/week (Aggressive)</option>
+								<option value="2">2 lbs/week (Very Aggressive)</option>
+								<option value="3">3 lbs/week (Extreme)</option>
+							</select>
+						</div>
+					</div>
+
+					<button
+						type="submit"
+						className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+						{currentUser ? "Update Profile" : "Create Profile"}
+					</button>
+				</form>
+			</div>
+		</div>
+	);
+};
