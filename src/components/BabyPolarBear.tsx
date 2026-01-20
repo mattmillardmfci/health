@@ -150,22 +150,8 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				/>
 
 				{/* Paw pads on front legs */}
-				<ellipse
-					cx={70 * scale}
-					cy={158 * scale}
-					rx={8 * scale}
-					ry={10 * scale}
-					fill="#f5d5d8"
-					opacity="0.7"
-				/>
-				<ellipse
-					cx={130 * scale}
-					cy={158 * scale}
-					rx={8 * scale}
-					ry={10 * scale}
-					fill="#f5d5d8"
-					opacity="0.7"
-				/>
+				<ellipse cx={70 * scale} cy={158 * scale} rx={8 * scale} ry={10 * scale} fill="#f5d5d8" opacity="0.7" />
+				<ellipse cx={130 * scale} cy={158 * scale} rx={8 * scale} ry={10 * scale} fill="#f5d5d8" opacity="0.7" />
 
 				{/* Neck */}
 				<ellipse
@@ -213,60 +199,20 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				/>
 
 				{/* Ears - positioned naturally on head */}
-				<circle
-					cx={72 * scale}
-					cy={18 * scale}
-					r={8 * scale}
-					fill="url(#bodyGrad)"
-					stroke="#d0d0d0"
-					strokeWidth="1"
-				/>
-				<circle
-					cx={128 * scale}
-					cy={18 * scale}
-					r={8 * scale}
-					fill="url(#bodyGrad)"
-					stroke="#d0d0d0"
-					strokeWidth="1"
-				/>
+				<circle cx={72 * scale} cy={18 * scale} r={8 * scale} fill="url(#bodyGrad)" stroke="#d0d0d0" strokeWidth="1" />
+				<circle cx={128 * scale} cy={18 * scale} r={8 * scale} fill="url(#bodyGrad)" stroke="#d0d0d0" strokeWidth="1" />
 
 				{/* Inner ear details */}
 				<circle cx={72 * scale} cy={18 * scale} r={4 * scale} fill="#e8d0d5" opacity="0.8" />
 				<circle cx={128 * scale} cy={18 * scale} r={4 * scale} fill="#e8d0d5" opacity="0.8" />
 
 				{/* Eyes - realistic and expressive */}
-				<circle
-					cx={82 * scale}
-					cy={38 * scale}
-					r={4.5 * scale}
-					fill="#1a1a1a"
-					stroke="#333"
-					strokeWidth="0.8"
-				/>
-				<circle
-					cx={118 * scale}
-					cy={38 * scale}
-					r={4.5 * scale}
-					fill="#1a1a1a"
-					stroke="#333"
-					strokeWidth="0.8"
-				/>
+				<circle cx={82 * scale} cy={38 * scale} r={4.5 * scale} fill="#1a1a1a" stroke="#333" strokeWidth="0.8" />
+				<circle cx={118 * scale} cy={38 * scale} r={4.5 * scale} fill="#1a1a1a" stroke="#333" strokeWidth="0.8" />
 
 				{/* Eye highlights - gives life and dimension */}
-				<circle
-					cx={83 * scale}
-					cy={36 * scale}
-					r={1.8 * scale}
-					fill="white"
-					opacity="0.9"
-				/>
-				<circle
-					cx={119 * scale}
-					cy={36 * scale}
-					r={1.8 * scale}
-					fill="white"
-					opacity="0.9"
-				/>
+				<circle cx={83 * scale} cy={36 * scale} r={1.8 * scale} fill="white" opacity="0.9" />
+				<circle cx={119 * scale} cy={36 * scale} r={1.8 * scale} fill="white" opacity="0.9" />
 
 				{/* Eyebrows for mood - subtle */}
 				{mood === "happy" && (
@@ -307,14 +253,7 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				)}
 
 				{/* Belly spot - lighter colored patch */}
-				<ellipse
-					cx={100 * scale}
-					cy={125 * scale}
-					rx={22 * scale}
-					ry={28 * scale}
-					fill="#ffffff"
-					opacity="0.5"
-				/>
+				<ellipse cx={100 * scale} cy={125 * scale} rx={22 * scale} ry={28 * scale} fill="#ffffff" opacity="0.5" />
 			</svg>
 		);
 	};

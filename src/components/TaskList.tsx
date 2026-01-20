@@ -103,11 +103,12 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 		const task = tasks.find((t) => t.id === taskId);
 		if (!task) return;
 
-		const now = new Date();
-		const completedDate = task.completedDate ? new Date(task.completedDate) : now;
-		completedDate.setHours(0, 0, 0, 0);
+		// Check if task was completed today
+		const wasCompletedToday = task.completedDate
+			? new Date(task.completedDate).toDateString() === today.toDateString()
+			: false;
 
-		const isCompletingToday = completedDate.getTime() !== today.getTime();
+		const isCompletingToday = !wasCompletedToday;
 
 		// Update the task
 		let newTaskCreated = false;
