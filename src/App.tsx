@@ -153,7 +153,17 @@ function AppContent() {
 				) : view === "results" ? (
 					<NutritionResults user={currentUser} />
 				) : view === "companion" ? (
-					<CompanionHub onQuestNavigate={(section) => setView(section)} />
+				<CompanionHub onQuestNavigate={(section) => {
+					// Convert quest activity names to view names
+					const viewMap: { [key: string]: ViewType } = {
+						meal: "meals",
+						activity: "activity",
+						journal: "journal",
+						weight: "progress",
+						goal: "goals"
+					};
+					setView(viewMap[section] || "results");
+				}} />
 				) : view === "progress" ? (
 					<ProgressTracking />
 				) : view === "goals" ? (
