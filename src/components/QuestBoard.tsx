@@ -253,7 +253,9 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 
 				{/* Active Quests */}
 				<div className="mb-8">
-					<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Active Quests ({activeQuests.length})</h3>
+					<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">
+						Active Quests ({activeQuests.length})
+					</h3>
 					<div className="space-y-2 sm:space-y-3">
 						{activeQuests.length > 0 ? (
 							activeQuests.map((quest) => (
@@ -266,8 +268,11 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 											<span className="text-xl sm:text-2xl flex-shrink-0">{getActivityIcon(quest.linkedActivity)}</span>
 											<div className="flex-1 min-w-0">
 												<div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 mb-1">
-													<h4 className="font-semibold text-sm sm:text-base text-gray-800 break-words">{quest.title}</h4>
-													<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${getQuestBadge(quest.type)} w-fit`}>
+													<h4 className="font-semibold text-sm sm:text-base text-gray-800 break-words">
+														{quest.title}
+													</h4>
+													<span
+														className={`text-xs font-bold px-2 py-0.5 rounded-full ${getQuestBadge(quest.type)} w-fit`}>
 														{quest.type.toUpperCase()}
 													</span>
 												</div>
@@ -323,7 +328,9 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 				{/* Completed Quests */}
 				{completedQuests.length > 0 && (
 					<div>
-						<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Completed ({completedQuests.length})</h3>
+						<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">
+							Completed ({completedQuests.length})
+						</h3>
 						<div className="space-y-2">
 							{completedQuests.map((quest) => (
 								<div

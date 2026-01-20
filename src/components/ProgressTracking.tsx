@@ -27,20 +27,45 @@ export const ProgressTracking: React.FC = () => {
 		};
 		const updated = { ...currentUser, weightLogs: [...weightLogs, log] };
 
+		// Award XP to companion
+		let updatedCompanion = { ...currentUser.companion };
+		let questCompleted = false;
+
 		// Update quest progress for weight logging
 		if (Array.isArray(updated.quests)) {
 			updated.quests = updated.quests.map((q: any) => {
-				if (q.linkedActivity === "weight") {
-					const isCompleted = true; // Just logging weight once completes it
+				if (q.linkedActivity === "weight" && !q.completed) {
+					questCompleted = true;
 					return {
 						...q,
 						currentProgress: 1,
-						completed: isCompleted,
-						completedDate: isCompleted && !q.completed ? new Date() : q.completedDate,
+						completed: true,
+						completedDate: new Date(),
 					};
 				}
 				return q;
 			});
+		}
+
+		// Award XP if quest was completed
+		if (questCompleted && updatedCompanion) {
+			const questRewardXP = 25; // Check In quest gives 25 XP
+			const questRewardPoints = 15; // Check In quest gives 15 points
+
+			updatedCompanion = {
+				...updatedCompanion,
+				experience: (updatedCompanion.experience || 0) + questRewardXP,
+				totalPoints: (updatedCompanion.totalPoints || 0) + questRewardPoints,
+				happiness: Math.min(100, (updatedCompanion.happiness || 70) + 5),
+			};
+
+			// Check for level up (100 XP per level)
+			if (updatedCompanion.experience >= 100) {
+				updatedCompanion.level = (updatedCompanion.level || 1) + Math.floor(updatedCompanion.experience / 100);
+				updatedCompanion.experience = updatedCompanion.experience % 100;
+			}
+
+			updated.companion = updatedCompanion;
 		}
 
 		updateUser(updated);

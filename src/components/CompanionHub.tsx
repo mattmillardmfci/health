@@ -51,7 +51,7 @@ export const CompanionHub: React.FC<{
 				adventureProgress: 0,
 				currentAdventure: "Awakening",
 				totalPoints: 0,
-				streakDays: 0,
+				streakDays: 1,
 				unlockedAchievements: [],
 				createdAt: new Date(),
 			};

@@ -67,125 +67,221 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 		updateUser(updated);
 	};
 
-	// SVG Bear component - much more realistic and detailed
+	// SVG Bear component - realistic polar bear with proper proportions
 	const PolarBearSVG: React.FC<{ stage: "cub" | "juvenile" | "adolescent" | "adult"; mood: string }> = ({
 		stage,
 		mood,
 	}) => {
 		const sizes = {
-			cub: 120,
-			juvenile: 160,
-			adolescent: 200,
-			adult: 240,
+			cub: 140,
+			juvenile: 180,
+			adolescent: 220,
+			adult: 260,
 		};
 		const size = sizes[stage];
-
-		// Proportions scale with stage
 		const scale = stage === "cub" ? 0.8 : stage === "juvenile" ? 1 : stage === "adolescent" ? 1.2 : 1.4;
 
-		// Eyes & mood
-		const eyeY = mood === "sleeping" ? 32 * scale : 28 * scale;
-		const eyeX1 = 40 * scale;
-		const eyeX2 = 60 * scale;
-
-		// Mouth expression
-		let mouthD = "M 48 50 Q 50 54 52 50"; // neutral smile
-		if (mood === "happy") {
-			mouthD = "M 45 50 Q 50 58 55 50"; // big happy smile
-		} else if (mood === "sad") {
-			mouthD = "M 45 56 Q 50 50 55 56"; // sad frown
-		} else if (mood === "hungry") {
-			mouthD = "M 50 48 L 50 58 M 47 53 L 53 53"; // surprised open O
-		}
-
 		return (
-			<svg width={size} height={size} viewBox="0 0 100 100" className="drop-shadow-2xl">
+			<svg width={size} height={size} viewBox="0 0 200 200" className="drop-shadow-2xl">
 				<defs>
-					<radialGradient id="bodyGrad" cx="40%" cy="40%">
+					<linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
+						<stop offset="50%" style={{ stopColor: "#f5f5f5", stopOpacity: 1 }} />
+						<stop offset="100%" style={{ stopColor: "#e8e8e8", stopOpacity: 1 }} />
+					</linearGradient>
+					<radialGradient id="faceGrad" cx="35%" cy="35%">
 						<stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
 						<stop offset="100%" style={{ stopColor: "#f0f0f0", stopOpacity: 1 }} />
 					</radialGradient>
-					<radialGradient id="faceGrad" cx="45%" cy="45%">
-						<stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
-						<stop offset="100%" style={{ stopColor: "#ebebeb", stopOpacity: 1 }} />
-					</radialGradient>
+					<filter id="shadow">
+						<feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+					</filter>
 				</defs>
 
-				{/* Main Body - thick and stocky */}
+				{/* Back Legs */}
 				<ellipse
-					cx="50"
-					cy="65"
+					cx={70 * scale}
+					cy={160 * scale}
+					rx={18 * scale}
+					ry={20 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+				<ellipse
+					cx={130 * scale}
+					cy={160 * scale}
+					rx={18 * scale}
+					ry={20 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Main Body - large and chunky like real polar bears */}
+				<ellipse
+					cx={100 * scale}
+					cy={120 * scale}
+					rx={40 * scale}
+					ry={45 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Front Legs */}
+				<ellipse
+					cx={70 * scale}
+					cy={140 * scale}
+					rx={16 * scale}
+					ry={22 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+				<ellipse
+					cx={130 * scale}
+					cy={140 * scale}
+					rx={16 * scale}
+					ry={22 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Paw pads on front legs */}
+				<ellipse
+					cx={70 * scale}
+					cy={158 * scale}
+					rx={8 * scale}
+					ry={10 * scale}
+					fill="#f5d5d8"
+					opacity="0.7"
+				/>
+				<ellipse
+					cx={130 * scale}
+					cy={158 * scale}
+					rx={8 * scale}
+					ry={10 * scale}
+					fill="#f5d5d8"
+					opacity="0.7"
+				/>
+
+				{/* Neck */}
+				<ellipse
+					cx={100 * scale}
+					cy={80 * scale}
 					rx={28 * scale}
 					ry={32 * scale}
 					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Head - realistic polar bear head shape */}
+				<ellipse
+					cx={100 * scale}
+					cy={45 * scale}
+					rx={32 * scale}
+					ry={35 * scale}
+					fill="url(#faceGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Snout/Muzzle - extended like real polar bears */}
+				<ellipse
+					cx={100 * scale}
+					cy={55 * scale}
+					rx={22 * scale}
+					ry={18 * scale}
+					fill="#f5f5f5"
 					stroke="#c0c0c0"
 					strokeWidth="1"
 				/>
 
-				{/* Neck connector */}
-				<rect x="42" y={36 * scale} width={16 * scale} height={8 * scale} rx="4" fill="url(#bodyGrad)" />
+				{/* Nose - black and realistic */}
+				<ellipse cx={100 * scale} cy={60 * scale} rx={5.5 * scale} ry={6 * scale} fill="#000000" />
 
-				{/* Head - rounder and bigger for cub appeal */}
-				<circle cx="50" cy={28 * scale} r={18 * scale} fill="url(#faceGrad)" stroke="#c0c0c0" strokeWidth="1" />
+				{/* Mouth line */}
+				<path
+					d={`M ${100 * scale} ${60 * scale} Q ${100 * scale} ${68 * scale} ${100 * scale} ${72 * scale}`}
+					stroke="#333"
+					strokeWidth={1.5 * scale}
+					fill="none"
+					strokeLinecap="round"
+				/>
 
-				{/* Ears - rounded and positioned higher */}
+				{/* Ears - positioned naturally on head */}
 				<circle
-					cx={35 * scale}
-					cy={10 * scale}
-					r={6 * scale}
+					cx={72 * scale}
+					cy={18 * scale}
+					r={8 * scale}
 					fill="url(#bodyGrad)"
-					stroke="#c0c0c0"
+					stroke="#d0d0d0"
+					strokeWidth="1"
+				/>
+				<circle
+					cx={128 * scale}
+					cy={18 * scale}
+					r={8 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#d0d0d0"
+					strokeWidth="1"
+				/>
+
+				{/* Inner ear details */}
+				<circle cx={72 * scale} cy={18 * scale} r={4 * scale} fill="#e8d0d5" opacity="0.8" />
+				<circle cx={128 * scale} cy={18 * scale} r={4 * scale} fill="#e8d0d5" opacity="0.8" />
+
+				{/* Eyes - realistic and expressive */}
+				<circle
+					cx={82 * scale}
+					cy={38 * scale}
+					r={4.5 * scale}
+					fill="#1a1a1a"
+					stroke="#333"
 					strokeWidth="0.8"
 				/>
 				<circle
-					cx={65 * scale}
-					cy={10 * scale}
-					r={6 * scale}
-					fill="url(#bodyGrad)"
-					stroke="#c0c0c0"
+					cx={118 * scale}
+					cy={38 * scale}
+					r={4.5 * scale}
+					fill="#1a1a1a"
+					stroke="#333"
 					strokeWidth="0.8"
 				/>
 
-				{/* Inner ear details - pink */}
-				<circle cx={35 * scale} cy={10 * scale} r={3 * scale} fill="#ffb3ba" opacity="0.7" />
-				<circle cx={65 * scale} cy={10 * scale} r={3 * scale} fill="#ffb3ba" opacity="0.7" />
-
-				{/* Snout/Muzzle - prominent and dark */}
-				<ellipse
-					cx="50"
-					cy={42 * scale}
-					rx={12 * scale}
-					ry={10 * scale}
-					fill="#e8e8e8"
-					stroke="#b0b0b0"
-					strokeWidth="0.8"
+				{/* Eye highlights - gives life and dimension */}
+				<circle
+					cx={83 * scale}
+					cy={36 * scale}
+					r={1.8 * scale}
+					fill="white"
+					opacity="0.9"
+				/>
+				<circle
+					cx={119 * scale}
+					cy={36 * scale}
+					r={1.8 * scale}
+					fill="white"
+					opacity="0.9"
 				/>
 
-				{/* Nose - black and prominent */}
-				<ellipse cx="50" cy={44 * scale} rx={3.5 * scale} ry={4 * scale} fill="#000000" />
-
-				{/* Eyes - large and expressive */}
-				<circle cx={eyeX1} cy={eyeY} r={3.5 * scale} fill="#1a1a1a" />
-				<circle cx={eyeX2} cy={eyeY} r={3.5 * scale} fill="#1a1a1a" />
-
-				{/* Eye shine - adds life to the eyes */}
-				<circle cx={eyeX1 - 1 * scale} cy={eyeY - 1 * scale} r={1 * scale} fill="white" opacity="0.8" />
-				<circle cx={eyeX2 - 1 * scale} cy={eyeY - 1 * scale} r={1 * scale} fill="white" opacity="0.8" />
-
-				{/* Eyebrows - for mood expression */}
+				{/* Eyebrows for mood - subtle */}
 				{mood === "happy" && (
 					<>
 						<path
-							d={`M ${37 * scale} ${22 * scale} Q ${40 * scale} ${20 * scale} ${43 * scale} ${22 * scale}`}
-							stroke="#999"
-							strokeWidth="1"
+							d={`M ${74 * scale} ${30 * scale} Q ${82 * scale} ${26 * scale} ${90 * scale} ${30 * scale}`}
+							stroke="#888"
+							strokeWidth={1.2 * scale}
 							fill="none"
 							strokeLinecap="round"
 						/>
 						<path
-							d={`M ${57 * scale} ${22 * scale} Q ${60 * scale} ${20 * scale} ${63 * scale} ${22 * scale}`}
-							stroke="#999"
-							strokeWidth="1"
+							d={`M ${110 * scale} ${30 * scale} Q ${118 * scale} ${26 * scale} ${126 * scale} ${30 * scale}`}
+							stroke="#888"
+							strokeWidth={1.2 * scale}
 							fill="none"
 							strokeLinecap="round"
 						/>
@@ -194,79 +290,31 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				{mood === "sad" && (
 					<>
 						<path
-							d={`M ${37 * scale} ${20 * scale} Q ${40 * scale} ${22 * scale} ${43 * scale} ${20 * scale}`}
-							stroke="#999"
-							strokeWidth="1"
+							d={`M ${74 * scale} ${28 * scale} Q ${82 * scale} ${32 * scale} ${90 * scale} ${28 * scale}`}
+							stroke="#888"
+							strokeWidth={1.2 * scale}
 							fill="none"
 							strokeLinecap="round"
 						/>
 						<path
-							d={`M ${57 * scale} ${20 * scale} Q ${60 * scale} ${22 * scale} ${63 * scale} ${20 * scale}`}
-							stroke="#999"
-							strokeWidth="1"
+							d={`M ${110 * scale} ${28 * scale} Q ${118 * scale} ${32 * scale} ${126 * scale} ${28 * scale}`}
+							stroke="#888"
+							strokeWidth={1.2 * scale}
 							fill="none"
 							strokeLinecap="round"
 						/>
 					</>
 				)}
 
-				{/* Mouth */}
-				<path
-					d={mouthD}
-					stroke="#333"
-					strokeWidth={1.2 * scale}
-					fill="none"
-					strokeLinecap="round"
-					strokeLinejoin="round"
+				{/* Belly spot - lighter colored patch */}
+				<ellipse
+					cx={100 * scale}
+					cy={125 * scale}
+					rx={22 * scale}
+					ry={28 * scale}
+					fill="#ffffff"
+					opacity="0.5"
 				/>
-
-				{/* Front Paws - realistic and proportional */}
-				{stage !== "cub" && (
-					<>
-						{/* Left paw */}
-						<ellipse
-							cx={32 * scale}
-							cy={85 * scale}
-							rx={8 * scale}
-							ry={11 * scale}
-							fill="url(#bodyGrad)"
-							stroke="#c0c0c0"
-							strokeWidth="0.8"
-						/>
-						{/* Paw pads - left */}
-						<circle cx={32 * scale} cy={90 * scale} r={2 * scale} fill="#ffb3ba" opacity="0.6" />
-
-						{/* Right paw */}
-						<ellipse
-							cx={68 * scale}
-							cy={85 * scale}
-							rx={8 * scale}
-							ry={11 * scale}
-							fill="url(#bodyGrad)"
-							stroke="#c0c0c0"
-							strokeWidth="0.8"
-						/>
-						{/* Paw pads - right */}
-						<circle cx={68 * scale} cy={90 * scale} r={2 * scale} fill="#ffb3ba" opacity="0.6" />
-					</>
-				)}
-
-				{/* Belly spot - grows with bear */}
-				{(stage === "adolescent" || stage === "adult") && (
-					<ellipse cx="50" cy={68 * scale} rx={13 * scale} ry={16 * scale} fill="#e0e0e0" opacity="0.6" />
-				)}
-
-				{/* Claws on paws - visible on larger bears */}
-				{stage !== "cub" && (
-					<>
-						<line x1={32 * scale} y1={92 * scale} x2={32 * scale} y2={96 * scale} stroke="#999" strokeWidth="0.8" />
-						<line x1={68 * scale} y1={92 * scale} x2={68 * scale} y2={96 * scale} stroke="#999" strokeWidth="0.8" />
-					</>
-				)}
-
-				{/* Cheeks - adds cuteness */}
-				<circle cx={28 * scale} cy={32 * scale} r={2.5 * scale} fill="#ffcccc" opacity="0.4" />
-				<circle cx={72 * scale} cy={32 * scale} r={2.5 * scale} fill="#ffcccc" opacity="0.4" />
 			</svg>
 		);
 	};
