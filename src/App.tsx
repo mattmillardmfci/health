@@ -36,95 +36,88 @@ function AppContent() {
 	const [view, setView] = useState<ViewType>(!currentUser ? "setup" : "results");
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+	// Scroll to top when navigating
+	React.useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [view]);
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-			{/* Header */}
-			<header className="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 w-full">
-					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-						<div>
-							<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-								❄️ Snowball
-							</h1>
-							<p className="text-gray-500 text-xs sm:text-sm mt-1">Raise your polar bear while mastering nutrition</p>
+			{/* Header - Only show when no user is logged in */}
+			{!currentUser && (
+				<header className="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
+					<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 w-full">
+						<div className="flex items-center justify-center">
+							<div className="text-center">
+								<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+									❄️ Snowball
+								</h1>
+								<p className="text-gray-500 text-xs sm:text-sm mt-1">Raise your polar bear while mastering nutrition</p>
+							</div>
 						</div>
-						{/* User Switcher */}
-						{users.length > 0 && (
-							<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-								<select
-									value={currentUser?.id || ""}
-									onChange={(e) => {
-										const user = users.find((u) => u.id === e.target.value);
-										if (user) setCurrentUser(user);
-									}}
-									className="px-3 sm:px-4 py-2.5 sm:py-2 bg-white border border-blue-200 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-									<option value="">Select User</option>
-									{users.map((user) => (
-										<option key={user.id} value={user.id}>
-											{user.name}
-										</option>
-									))}
-								</select>
-								<button
-									onClick={() => setView("setup")}
-									className="px-3 sm:px-4 py-2.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition duration-200 font-semibold whitespace-nowrap">
-									{currentUser ? "Edit" : "New User"}
-								</button>
-								<button
-									onClick={() => setView("settings")}
-									className={`px-3 sm:px-4 py-2.5 sm:py-2 text-sm rounded-lg transition duration-200 font-semibold whitespace-nowrap ${
-										view === "settings" ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-									}`}>
-									⚙️
-								</button>
-							</div>
-						)}
-
-						{/* Mobile Menu Button */}
-						{currentUser && (
-							<button
-								onClick={() => setMobileNavOpen(!mobileNavOpen)}
-								className="sm:hidden px-3 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition">
-								{mobileNavOpen ? "✕" : "☰"}
-							</button>
-						)}
 					</div>
+				</header>
+			)}
 
-					{/* Navigation Buttons */}
-					{currentUser && (
-						<nav
-							className={`${mobileNavOpen ? "block" : "hidden"} sm:block border-t border-blue-100 sm:border-t-0 sm:mt-0 mt-4 pt-4 sm:pt-0`}>
-							<div className="flex flex-wrap gap-2 text-xs sm:text-sm">
-								{[
-									{ view: "home", label: "🏠 Home" },
-									{ view: "companion", label: "🐻‍❄️ Companion" },
-									{ view: "results", label: "💪 Nutrition" },
-									{ view: "progress", label: "📈 Progress" },
-									{ view: "goals", label: "🎯 Goals" },
-									{ view: "meals", label: "🍽️ Meals" },
-									{ view: "activity", label: "🏃 Activity" },
-									{ view: "journal", label: "📔 Journal" },
-									{ view: "supplements", label: "💊 Supplements" },
-									{ view: "analytics", label: "📊 Analytics" },
-									{ view: "recipes", label: "👨‍🍳 Recipes" },
-								].map((item) => (
-									<button
-										key={item.view}
-										onClick={() => {
-											setView(item.view as ViewType);
-											setMobileNavOpen(false);
-										}}
-										className={`block sm:inline-block w-full sm:w-auto text-left px-2.5 sm:px-3 py-2.5 sm:py-1.5 sm:py-2 rounded-lg transition duration-200 font-semibold ${
-											view === item.view ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-										}`}>
-										{item.label}
-									</button>
-								))}
-							</div>
-						</nav>
-					)}
+			{/* Floating Mobile Menu - Only show when user is logged in */}
+			{currentUser && (
+				<button
+					onClick={() => setMobileNavOpen(!mobileNavOpen)}
+					className="fixed top-4 right-4 z-50 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-bold text-lg shadow-lg transition duration-200">
+					{mobileNavOpen ? "✕" : "☰"}
+				</button>
+			)}
+
+			{/* Floating Mobile Menu Dropdown */}
+			{currentUser && mobileNavOpen && (
+				<div className="fixed top-16 right-4 z-50 bg-white rounded-xl shadow-2xl border border-blue-100 overflow-hidden w-64">
+					<nav className="flex flex-col p-2">
+						{[
+							{ view: "home", label: "🏠 Home" },
+							{ view: "companion", label: "🐻‍❄️ Companion" },
+							{ view: "results", label: "💪 Nutrition" },
+							{ view: "progress", label: "📈 Progress" },
+							{ view: "goals", label: "🎯 Goals" },
+							{ view: "meals", label: "🍽️ Meals" },
+							{ view: "activity", label: "🏃 Activity" },
+							{ view: "journal", label: "📔 Journal" },
+							{ view: "supplements", label: "💊 Supplements" },
+							{ view: "analytics", label: "📊 Analytics" },
+							{ view: "recipes", label: "👨‍🍳 Recipes" },
+						].map((item) => (
+							<button
+								key={item.view}
+								onClick={() => {
+									setView(item.view as ViewType);
+									setMobileNavOpen(false);
+								}}
+								className={`block w-full text-left px-4 py-3 rounded-lg transition duration-200 font-semibold text-sm ${
+									view === item.view ? "bg-blue-600 text-white" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+								}`}>
+								{item.label}
+							</button>
+						))}
+						<div className="border-t border-gray-200 mt-2 pt-2">
+							<button
+								onClick={() => {
+									setView("setup");
+									setMobileNavOpen(false);
+								}}
+								className="block w-full text-left px-4 py-3 rounded-lg transition duration-200 font-semibold text-sm bg-gray-50 text-gray-700 hover:bg-gray-100">
+								✏️ Edit Profile
+							</button>
+							<button
+								onClick={() => {
+									setView("settings");
+									setMobileNavOpen(false);
+								}}
+								className="block w-full text-left px-4 py-3 rounded-lg transition duration-200 font-semibold text-sm bg-gray-50 text-gray-700 hover:bg-gray-100">
+								⚙️ Settings
+							</button>
+						</div>
+					</nav>
 				</div>
-			</header>
+			)}
 
 			{/* Main Content */}
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -146,7 +139,12 @@ function AppContent() {
 							</button>
 						</div>
 						<div className="flex justify-center">
-							<UserProfileForm onProfileCreated={() => setView("results")} />
+						<UserProfileForm
+						onProfileCreated={() => {
+							setView("home");
+							window.scrollTo(0, 0);
+						}}
+					/>
 						</div>
 					</>
 				) : !currentUser ? (
