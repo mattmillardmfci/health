@@ -45,13 +45,15 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	// Get ALL tasks for a category (including completed) to show total count
+	// Get ALL tasks for a category (for total count) - count all recurring tasks that exist, excluding progression tasks
 	const getAllTasksForCategory = (category: "morning" | "anytime" | "special") => {
 		return tasks.filter((t) => {
 			if (t.category !== category) return false;
-			// For recurring: show all (they reset daily)
+			// Exclude progression chain tasks (they're variants of base tasks)
+			if (t.progressionChainId) return false;
+			// For recurring tasks: always count them (they reset daily)
 			if (t.isRecurring) return true;
-			// For non-recurring: show all undone
+			// For non-recurring: only count if not completed
 			return !t.completed;
 		});
 	};
