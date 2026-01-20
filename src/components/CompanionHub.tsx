@@ -340,7 +340,7 @@ export const CompanionHub: React.FC<{
 			{/* Pet Naming Modal */}
 			{showNaming && (
 				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-					<div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl p-8 sm:p-12 max-w-sm w-full shadow-2xl border-3 border-cyan-300 transform animate-bounce">
+				<div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl p-8 sm:p-12 max-w-sm w-full shadow-2xl border-3 border-cyan-300">
 						<h2 className="text-3xl font-black text-center mb-2 bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
 							❄️ Name Your Polar Bear Cub
 						</h2>
