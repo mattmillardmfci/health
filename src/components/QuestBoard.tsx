@@ -242,40 +242,40 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 	const completedQuests = quests.filter((q) => q.completed);
 
 	return (
-		<div className="w-full max-w-4xl mx-auto px-4 py-6">
-			<div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-purple-100">
+		<div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+			<div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-8 border border-purple-100">
 				<div className="flex items-center justify-between mb-6">
-					<h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+					<h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
 						Quest Board
 					</h2>
-					<div className="text-3xl">📋</div>
+					<div className="text-2xl sm:text-3xl">📋</div>
 				</div>
 
 				{/* Active Quests */}
 				<div className="mb-8">
-					<h3 className="text-lg font-semibold text-gray-800 mb-4">Active Quests ({activeQuests.length})</h3>
-					<div className="space-y-3">
+					<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Active Quests ({activeQuests.length})</h3>
+					<div className="space-y-2 sm:space-y-3">
 						{activeQuests.length > 0 ? (
 							activeQuests.map((quest) => (
 								<div
 									key={quest.id}
-									className={`bg-gradient-to-br ${getQuestColor(quest.type)} p-4 rounded-lg border-2 transition hover:shadow-lg hover:scale-105 cursor-pointer`}
+									className={`bg-gradient-to-br ${getQuestColor(quest.type)} p-3 sm:p-4 rounded-lg border-2 transition hover:shadow-lg hover:scale-105 cursor-pointer`}
 									onClick={() => onNavigate?.(quest.linkedActivity)}>
-									<div className="flex items-start justify-between mb-3">
-										<div className="flex items-start gap-3 flex-1">
-											<span className="text-2xl">{getActivityIcon(quest.linkedActivity)}</span>
-											<div className="flex-1">
-												<div className="flex items-center gap-2">
-													<h4 className="font-semibold text-gray-800">{quest.title}</h4>
-													<span className={`text-xs font-bold px-2 py-1 rounded-full ${getQuestBadge(quest.type)}`}>
+									<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-3">
+										<div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+											<span className="text-xl sm:text-2xl flex-shrink-0">{getActivityIcon(quest.linkedActivity)}</span>
+											<div className="flex-1 min-w-0">
+												<div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 mb-1">
+													<h4 className="font-semibold text-sm sm:text-base text-gray-800 break-words">{quest.title}</h4>
+													<span className={`text-xs font-bold px-2 py-0.5 rounded-full ${getQuestBadge(quest.type)} w-fit`}>
 														{quest.type.toUpperCase()}
 													</span>
 												</div>
-												<p className="text-sm text-gray-600">{quest.description}</p>
+												<p className="text-xs sm:text-sm text-gray-600 break-words">{quest.description}</p>
 											</div>
 										</div>
-										<div className="text-right">
-											<p className="text-sm font-semibold text-cyan-600">+{quest.rewardPoints} pts</p>
+										<div className="text-right text-xs sm:text-sm mt-2 sm:mt-0 flex-shrink-0">
+											<p className="font-semibold text-cyan-600 text-sm sm:text-base">+{quest.rewardPoints} pts</p>
 											<p className="text-xs text-gray-600">+{quest.rewardXP} XP</p>
 										</div>
 									</div>
@@ -302,11 +302,11 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 												e.stopPropagation();
 												handleCompleteQuest(quest.id);
 											}}
-											className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold rounded-lg transition text-sm">
+											className="w-full px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold rounded-lg transition text-xs sm:text-sm">
 											✓ Claim Reward
 										</button>
 									) : (
-										<div className="w-full px-3 py-2 bg-gray-200 text-gray-600 font-semibold rounded-lg text-sm text-center">
+										<div className="w-full px-3 py-2 bg-gray-200 text-gray-600 font-semibold rounded-lg text-xs sm:text-sm text-center">
 											Click to log • {quest.targetCount - quest.currentProgress} to go
 										</div>
 									)}
@@ -314,7 +314,7 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 							))
 						) : (
 							<div className="text-center py-8 text-gray-500">
-								<p>No active quests! Check back tomorrow for daily quests.</p>
+								<p className="text-sm sm:text-base">No active quests! Check back tomorrow for daily quests.</p>
 							</div>
 						)}
 					</div>
@@ -323,23 +323,23 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 				{/* Completed Quests */}
 				{completedQuests.length > 0 && (
 					<div>
-						<h3 className="text-lg font-semibold text-gray-800 mb-4">Completed ({completedQuests.length})</h3>
+						<h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Completed ({completedQuests.length})</h3>
 						<div className="space-y-2">
 							{completedQuests.map((quest) => (
 								<div
 									key={quest.id}
-									className="bg-emerald-50 p-3 rounded-lg border border-emerald-200 flex items-center justify-between">
-									<div className="flex items-center gap-2">
-										<span className="text-xl">✓</span>
-										<div>
-											<p className="font-semibold text-gray-800">{quest.title}</p>
+									className="bg-emerald-50 p-2 sm:p-3 rounded-lg border border-emerald-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+									<div className="flex items-center gap-2 min-w-0">
+										<span className="text-lg flex-shrink-0">✓</span>
+										<div className="min-w-0">
+											<p className="font-semibold text-sm sm:text-base text-gray-800 break-words">{quest.title}</p>
 											<p className="text-xs text-gray-600">
 												{quest.completedDate && new Date(quest.completedDate).toLocaleDateString()}
 											</p>
 										</div>
 									</div>
-									<div className="text-right">
-										<p className="text-xs font-bold text-emerald-600">+{quest.rewardPoints}</p>
+									<div className="text-right flex-shrink-0">
+										<p className="text-xs sm:text-sm font-bold text-emerald-600">+{quest.rewardPoints}</p>
 									</div>
 								</div>
 							))}
@@ -348,9 +348,9 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 				)}
 
 				{/* Quest Tips */}
-				<div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-					<p className="font-semibold text-blue-900 mb-2">💡 Quest Tips</p>
-					<ul className="text-sm text-blue-800 space-y-1">
+				<div className="mt-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+					<p className="font-semibold text-sm sm:text-base text-blue-900 mb-2">💡 Quest Tips</p>
+					<ul className="text-xs sm:text-sm text-blue-800 space-y-1">
 						<li>• Complete daily quests every day to build your streak</li>
 						<li>• Each completed quest boosts your companion's stats</li>
 						<li>• Earn XP to level up your bear (1000 XP = 1 level)</li>

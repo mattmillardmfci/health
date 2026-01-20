@@ -60,7 +60,7 @@ export const CompanionHub: React.FC<{
 			const today = new Date();
 			const tomorrow = new Date(today);
 			tomorrow.setDate(tomorrow.getDate() + 1);
-			
+
 			const initialQuests = [
 				{
 					id: "daily-meal-1",
