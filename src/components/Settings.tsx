@@ -200,19 +200,19 @@ export const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
 
 				{/* Account */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Account</h3>				
-				{/* Logout */}
-				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
-					<p className="font-semibold text-gray-800 dark:text-white mb-2">Sign Out</p>
-					<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Log out of {currentUser.name}'s account</p>
-					<button
-						onClick={handleLogout}
-						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
-						Log Out
-					</button>
-				</div>
-
-				{/* Delete Account */}					<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+					<h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Account</h3>
+					{/* Logout */}
+					<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+						<p className="font-semibold text-gray-800 dark:text-white mb-2">Sign Out</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Log out of {currentUser.name}'s account</p>
+						<button
+							onClick={handleLogout}
+							className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+							Log Out
+						</button>
+					</div>
+					{/* Delete Account */}{" "}
+					<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
 						<p className="font-semibold text-gray-800 dark:text-white mb-2">Delete Account</p>
 						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 							Permanently delete {currentUser.name}'s account and all associated data. This cannot be undone.
