@@ -69,6 +69,10 @@ export const MealLogger: React.FC = () => {
 		const updated = { ...currentUser, mealLogs: [...mealLogs, meal] };
 
 		// Update quest progress for meal logging
+		let questCompleted = false;
+		let questRewardXP = 0;
+		let questRewardPoints = 0;
+
 		if (Array.isArray(updated.quests)) {
 			const todayDate = new Date(selectedDate);
 			todayDate.setHours(0, 0, 0, 0);
@@ -84,6 +88,13 @@ export const MealLogger: React.FC = () => {
 					const newProgress = todayMealsCount;
 					const isCompleted = newProgress >= q.targetCount;
 
+					// Track if this completion is new (quest wasn't already completed)
+					if (isCompleted && !q.completed) {
+						questCompleted = true;
+						questRewardXP = q.rewardXP || 50;
+						questRewardPoints = q.rewardPoints || 30;
+					}
+
 					return {
 						...q,
 						currentProgress: newProgress,
@@ -93,6 +104,22 @@ export const MealLogger: React.FC = () => {
 				}
 				return q;
 			});
+		}
+
+		// Award XP to companion if quest was completed
+		if (questCompleted && updated.companion) {
+			updated.companion = {
+				...updated.companion,
+				experience: (updated.companion.experience || 0) + questRewardXP,
+				totalPoints: (updated.companion.totalPoints || 0) + questRewardPoints,
+				happiness: Math.min(100, (updated.companion.happiness || 70) + 5),
+			};
+
+			// Check for level up (100 XP per level)
+			if (updated.companion.experience >= 100 * updated.companion.level) {
+				updated.companion.level = (updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
+				updated.companion.experience = updated.companion.experience % (100 * updated.companion.level);
+			}
 		}
 
 		updateUser(updated);
@@ -122,6 +149,10 @@ export const MealLogger: React.FC = () => {
 		const updated = { ...currentUser, mealLogs: [...mealLogs, meal] };
 
 		// Update quest progress for meal logging
+		let questCompleted = false;
+		let questRewardXP = 0;
+		let questRewardPoints = 0;
+
 		if (Array.isArray(updated.quests)) {
 			const todayDate = new Date(selectedDate);
 			todayDate.setHours(0, 0, 0, 0);
@@ -137,6 +168,13 @@ export const MealLogger: React.FC = () => {
 					const newProgress = todayMealsCount;
 					const isCompleted = newProgress >= q.targetCount;
 
+					// Track if this completion is new (quest wasn't already completed)
+					if (isCompleted && !q.completed) {
+						questCompleted = true;
+						questRewardXP = q.rewardXP || 50;
+						questRewardPoints = q.rewardPoints || 30;
+					}
+
 					return {
 						...q,
 						currentProgress: newProgress,
@@ -146,6 +184,22 @@ export const MealLogger: React.FC = () => {
 				}
 				return q;
 			});
+		}
+
+		// Award XP to companion if quest was completed
+		if (questCompleted && updated.companion) {
+			updated.companion = {
+				...updated.companion,
+				experience: (updated.companion.experience || 0) + questRewardXP,
+				totalPoints: (updated.companion.totalPoints || 0) + questRewardPoints,
+				happiness: Math.min(100, (updated.companion.happiness || 70) + 5),
+			};
+
+			// Check for level up (100 XP per level)
+			if (updated.companion.experience >= 100 * updated.companion.level) {
+				updated.companion.level = (updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
+				updated.companion.experience = updated.companion.experience % (100 * updated.companion.level);
+			}
 		}
 
 		updateUser(updated);
