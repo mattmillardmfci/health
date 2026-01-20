@@ -238,6 +238,11 @@ export interface User {
 	goals?: Goal[];
 	supplementStacks?: SupplementStack[];
 
+	// Mental health & wellness
+	mentalHealthChallenges?: string[]; // "Depression", "PTSD", "OCD", "Anxiety", "ADHD", "Bipolar Disorder", "Other", "I don't have any"
+	supportAreas?: string[]; // "Be more active", "Sleep better", "Stay fresh and clean", "Build healthy eating habits", "Manage stress", etc.
+	overwhelmTriggers?: string[]; // "Financial concerns", "Making decisions", "Mental or physical health", "Lack of time for yourself", "Relationship issues", etc.
+
 	// Gamification
 	companion?: CompanionStats;
 	quests?: Quest[];

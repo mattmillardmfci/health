@@ -43,11 +43,10 @@ function AppContent() {
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
 						<div>
 							<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-								LifeCoach Pro
+								❄️ Snowball
 							</h1>
-							<p className="text-gray-500 text-xs sm:text-sm mt-1">Scientific Nutrition & Life Optimization</p>
+							<p className="text-gray-500 text-xs sm:text-sm mt-1">Raise your polar bear while mastering nutrition</p>
 						</div>
-
 						{/* User Switcher */}
 						{users.length > 0 && (
 							<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
@@ -137,9 +136,9 @@ function AppContent() {
 				) : !currentUser ? (
 					<div className="text-center py-12 sm:py-20 px-4">
 						<div className="inline-block p-6 sm:p-12 bg-white rounded-2xl shadow-md max-w-sm">
-							<h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Welcome to LifeCoach Pro</h2>
+							<h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Welcome to Snowball ❄️</h2>
 							<p className="text-gray-600 mb-6 text-sm sm:text-base">
-								Create a profile to get started with personalized nutrition planning
+								Raise your polar bear companion while optimizing your nutrition and fitness!
 							</p>
 							<button
 								onClick={() => setView("setup")}

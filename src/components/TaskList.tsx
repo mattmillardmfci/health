@@ -8,10 +8,7 @@ interface TaskListProps {
 	onQuestComplete?: (questId: string) => void;
 }
 
-export const TaskList: React.FC<TaskListProps> = ({
-	onTaskComplete,
-	onQuestComplete,
-}) => {
+export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestComplete }) => {
 	const { currentUser, updateUser } = useUsers();
 	const [expandedCategories, setExpandedCategories] = useState<{
 		[key: string]: boolean;
@@ -29,7 +26,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 	if (!currentUser) return null;
 
 	const tasks = currentUser.tasks || [];
-	
+
 	// Initialize quests if they don't exist
 	const quests = useMemo(() => {
 		if (!currentUser.quests || currentUser.quests.length === 0) {
@@ -87,40 +84,30 @@ export const TaskList: React.FC<TaskListProps> = ({
 		if (!task) return;
 
 		const now = new Date();
-		const completedDate = task.completedDate
-			? new Date(task.completedDate)
-			: now;
+		const completedDate = task.completedDate ? new Date(task.completedDate) : now;
 		completedDate.setHours(0, 0, 0, 0);
 
 		const isCompletingToday = completedDate.getTime() !== today.getTime();
 
 		// Update the task
 		let newTaskCreated = false;
-		const updatedTasks = currentUser.tasks?.map((t) => {
-			if (t.id === taskId) {
-				return {
-					...t,
-					completed: !t.completed,
-					completedDate: isCompletingToday ? now : undefined,
-					dailyStreak: isCompletingToday
-						? (t.dailyStreak || 0) + 1
-						: t.dailyStreak,
-				};
-			}
-			return t;
-		}) || [];
+		const updatedTasks =
+			currentUser.tasks?.map((t) => {
+				if (t.id === taskId) {
+					return {
+						...t,
+						completed: !t.completed,
+						completedDate: isCompletingToday ? now : undefined,
+						dailyStreak: isCompletingToday ? (t.dailyStreak || 0) + 1 : t.dailyStreak,
+					};
+				}
+				return t;
+			}) || [];
 
 		// If completing and has progression value, create next task
-		if (
-			isCompletingToday &&
-			task.progressionValue &&
-			task.progressionValue > 0
-		) {
+		if (isCompletingToday && task.progressionValue && task.progressionValue > 0) {
 			const nextValue = task.progressionValue * 2;
-			const progressionTaskTitle = task.title.replace(
-				task.progressionValue.toString(),
-				nextValue.toString()
-			);
+			const progressionTaskTitle = task.title.replace(task.progressionValue.toString(), nextValue.toString());
 
 			const progressionTask: Task = {
 				id: `task-${Date.now()}`,
@@ -157,7 +144,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 				quests,
 			},
 			taskId,
-			newTaskCreated
+			newTaskCreated,
 		);
 
 		// Notify of completed quests
@@ -249,8 +236,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 						taskList.map((task) => {
 							// Check if completed today
 							const completedToday = task.completedDate
-								? new Date(task.completedDate).toDateString() ===
-									new Date().toDateString()
+								? new Date(task.completedDate).toDateString() === new Date().toDateString()
 								: false;
 
 							// Show progression info
@@ -263,9 +249,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 								<label
 									key={task.id}
 									className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
-										completedToday
-											? "bg-emerald-50 opacity-60"
-											: "hover:bg-cyan-50"
+										completedToday ? "bg-emerald-50 opacity-60" : "hover:bg-cyan-50"
 									}`}>
 									<input
 										type="checkbox"
@@ -275,16 +259,10 @@ export const TaskList: React.FC<TaskListProps> = ({
 									/>
 									<span className="text-sm sm:text-base text-gray-800 flex-1">
 										{task.title}
-										{progressText && (
-											<span className="text-gray-500 text-xs ml-1">{progressText}</span>
-										)}
-										{task.reward && (
-											<span className="text-cyan-600 font-bold ml-2">+{task.reward}xp</span>
-										)}
+										{progressText && <span className="text-gray-500 text-xs ml-1">{progressText}</span>}
+										{task.reward && <span className="text-cyan-600 font-bold ml-2">+{task.reward}xp</span>}
 									</span>
-									{completedToday && (
-										<span className="text-emerald-600 text-lg">✓</span>
-									)}
+									{completedToday && <span className="text-emerald-600 text-lg">✓</span>}
 								</label>
 							);
 						})
@@ -299,7 +277,8 @@ export const TaskList: React.FC<TaskListProps> = ({
 			{/* Today's Checkpoint Header */}
 			<div className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 rounded-2xl p-6 sm:p-8 mb-8 text-white shadow-lg">
 				<h1 className="text-2xl sm:text-3xl font-bold mb-2">
-					📍 Today's Checkpoint - {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+					📍 Today's Checkpoint -{" "}
+					{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
 				</h1>
 				<p className="text-orange-100">
 					{currentUser.companion?.name || "Your polar bear"} is watching! Complete tasks to earn XP.
@@ -359,9 +338,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 							<select
 								value={newTaskCategory}
-								onChange={(e) =>
-									setNewTaskCategory(e.target.value as "morning" | "anytime")
-								}
+								onChange={(e) => setNewTaskCategory(e.target.value as "morning" | "anytime")}
 								className="px-3 py-2 border-2 border-cyan-300 rounded-lg text-sm">
 								<option value="anytime">Anytime Task</option>
 								<option value="morning">Morning Task</option>
@@ -418,9 +395,7 @@ export const TaskList: React.FC<TaskListProps> = ({
 				<p className="text-sm sm:text-base text-gray-700 mb-2">
 					<span className="font-bold">💡 Progression Tasks:</span> Complete "Do 10 pushups" to unlock "Do 20 pushups"!
 				</p>
-				<p className="text-xs text-gray-600 italic">
-					Each progression earns bonus XP and builds toward quest rewards.
-				</p>
+				<p className="text-xs text-gray-600 italic">Each progression earns bonus XP and builds toward quest rewards.</p>
 			</div>
 		</div>
 	);

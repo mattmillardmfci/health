@@ -1,12 +1,9 @@
-import { User, Task, Quest, CompanionStats } from "../types";
+import type { User, Task, Quest, CompanionStats } from "../types/index";
 
 /**
  * Award XP to companion when a task is completed
  */
-export const awardXpToCompanion = (
-	companion: CompanionStats | undefined,
-	xpAmount: number
-): CompanionStats => {
+export const awardXpToCompanion = (companion: CompanionStats | undefined, xpAmount: number): CompanionStats => {
 	if (!companion) {
 		return {
 			id: `companion-${Date.now()}`,
@@ -65,7 +62,7 @@ export const awardXpToCompanion = (
 export const checkTaskQuests = (
 	currentUser: User,
 	completedTaskId: string,
-	newTaskCreated: boolean
+	newTaskCreated: boolean,
 ): { updatedQuests: Quest[]; completedQuestIds: string[] } => {
 	const tasks = currentUser.tasks || [];
 	const quests = currentUser.quests || [];

@@ -67,220 +67,278 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 		updateUser(updated);
 	};
 
-	const getBearEmoji = () => {
-		switch (bearAnimation) {
-			case "happy":
-				return "🐻‍❄️😄";
-			case "hungry":
-				return "🐻‍❄️😋";
-			case "sad":
-				return "🐻‍❄️😢";
-			case "sleeping":
-				return "🐻‍❄️😴";
-			default:
-				return "🐻‍❄️";
+	// SVG Bear component with size scaling based on stage
+	const PolarBearSVG: React.FC<{ stage: "cub" | "juvenile" | "adolescent" | "adult"; mood: string }> = ({
+		stage,
+		mood,
+	}) => {
+		const sizes = {
+			cub: 100,
+			juvenile: 140,
+			adolescent: 180,
+			adult: 220,
+		};
+		const size = sizes[stage];
+
+		// Eye expression based on mood
+		const eyeY = mood === "sleeping" ? 25 : 20;
+		const eyeRadius = mood === "sleeping" ? 2 : 4;
+
+		// Mouth expression
+		let mouthPath = "M 50 55 Q 50 60 55 60"; // neutral
+		if (mood === "happy") {
+			mouthPath = "M 45 55 Q 50 62 55 55"; // happy smile
+		} else if (mood === "sad") {
+			mouthPath = "M 45 60 Q 50 55 55 60"; // sad frown
+		} else if (mood === "hungry") {
+			mouthPath = "M 48 52 L 50 60 L 52 52"; // surprised O
 		}
-	};
 
-	const getPetGrowthEmoji = () => {
-		switch (companion.stage) {
-			case "cub":
-				return "🐻‍❄️"; // Cub
-			case "juvenile":
-				return "🐻"; // Bigger bear
-			case "adolescent":
-				return "🐻‍❄️"; // Full bear
-			case "adult":
-				return "🦌"; // Majestic adult (different creature symbol)
-			default:
-				return "🐻‍❄️";
-		}
-	};
+		const bodyRx = stage === "cub" ? 25 : stage === "juvenile" ? 30 : stage === "adolescent" ? 33 : 35;
+		const bodyRy = stage === "cub" ? 28 : stage === "juvenile" ? 32 : stage === "adolescent" ? 35 : 38;
+		const headRad = stage === "cub" ? 20 : stage === "juvenile" ? 25 : stage === "adolescent" ? 28 : 32;
+		const earRad = stage === "cub" ? 8 : stage === "juvenile" ? 10 : stage === "adolescent" ? 11 : 12;
+		const leftEarX = stage === "cub" ? 35 : stage === "juvenile" ? 32 : stage === "adolescent" ? 30 : 28;
+		const rightEarX = stage === "cub" ? 65 : stage === "juvenile" ? 68 : stage === "adolescent" ? 70 : 72;
+		const snoutRx = stage === "cub" ? 12 : stage === "juvenile" ? 14 : stage === "adolescent" ? 16 : 18;
+		const snoutRy = stage === "cub" ? 10 : stage === "juvenile" ? 12 : stage === "adolescent" ? 13 : 15;
 
-	const getGrowthText = () => {
-		switch (companion.stage) {
-			case "cub":
-				return "Your Little Cub (Lvl 1-19)";
-			case "juvenile":
-				return "Growing Young Bear (Lvl 20-39)";
-			case "adolescent":
-				return "Maturing Adolescent (Lvl 40-59)";
-			case "adult":
-				return "Magnificent Adult (Lvl 60+)";
-			default:
-				return "Your Companion";
-		}
-	};
+		return (
+			<svg width={size} height={size} viewBox="0 0 100 100" className="drop-shadow-lg">
+				{/* Body */}
+				<ellipse cx="50" cy="60" rx={bodyRx} ry={bodyRy} fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
 
-	const getStatColor = (value: number): string => {
-		if (value >= 75) return "text-emerald-600";
-		if (value >= 50) return "text-blue-600";
-		if (value >= 25) return "text-orange-600";
-		return "text-red-600";
-	};
+				{/* Head */}
+				<circle cx="50" cy="30" r={headRad} fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
 
-	const getStatBar = (value: number): string => {
-		if (value >= 75) return "bg-emerald-500";
-		if (value >= 50) return "bg-blue-500";
-		if (value >= 25) return "bg-orange-500";
-		return "bg-red-500";
+				{/* Ears */}
+				<circle
+					cx={leftEarX}
+					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
+					r={earRad}
+					fill="white"
+					stroke="#e0e0e0"
+					strokeWidth="1.5"
+				/>
+				<circle
+					cx={rightEarX}
+					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
+					r={earRad}
+					fill="white"
+					stroke="#e0e0e0"
+					strokeWidth="1.5"
+				/>
+
+				{/* Inner ears */}
+				<circle
+					cx={leftEarX}
+					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
+					r={stage === "cub" ? 5 : stage === "juvenile" ? 6 : stage === "adolescent" ? 7 : 8}
+					fill="#f5f5f5"
+				/>
+				<circle
+					cx={rightEarX}
+					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
+					r={stage === "cub" ? 5 : stage === "juvenile" ? 6 : stage === "adolescent" ? 7 : 8}
+					fill="#f5f5f5"
+				/>
+
+				{/* Snout */}
+				<ellipse cx="50" cy="45" rx={snoutRx} ry={snoutRy} fill="#f5f5f5" />
+
+				{/* Eyes */}
+				<circle
+					cx={stage === "cub" ? 43 : stage === "juvenile" ? 42 : stage === "adolescent" ? 41 : 40}
+					cy={eyeY}
+					r={eyeRadius}
+					fill="#333"
+				/>
+				<circle
+					cx={stage === "cub" ? 57 : stage === "juvenile" ? 58 : stage === "adolescent" ? 59 : 60}
+					cy={eyeY}
+					r={eyeRadius}
+					fill="#333"
+				/>
+
+				{/* Nose */}
+				<circle cx="50" cy="50" r="3" fill="#333" />
+
+				{/* Mouth */}
+				<path d={mouthPath} stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+
+				{/* Paws - get bigger with stages */}
+				{stage !== "cub" && (
+					<>
+						<ellipse
+							cx={stage === "juvenile" ? 32 : stage === "adolescent" ? 30 : 28}
+							cy="85"
+							rx="10"
+							ry="12"
+							fill="white"
+							stroke="#e0e0e0"
+							strokeWidth="1"
+						/>
+						<ellipse
+							cx={stage === "juvenile" ? 68 : stage === "adolescent" ? 70 : 72}
+							cy="85"
+							rx="10"
+							ry="12"
+							fill="white"
+							stroke="#e0e0e0"
+							strokeWidth="1"
+						/>
+					</>
+				)}
+
+				{/* Belly spot grows with bear */}
+				{stage === "adolescent" && <ellipse cx="50" cy="65" rx="12" ry="14" fill="#f0f0f0" opacity="0.8" />}
+				{stage === "adult" && <ellipse cx="50" cy="68" rx="15" ry="18" fill="#f0f0f0" opacity="0.8" />}
+			</svg>
+		);
 	};
 
 	return (
-		<div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 sm:p-6 rounded-2xl border-3 border-cyan-300 shadow-lg">
-			{/* Header */}
-			<div className="flex justify-between items-center mb-4">
-				<div>
-					<h3 className="text-lg sm:text-xl font-bold text-gray-800">{companion.name}</h3>
-					<p className="text-xs sm:text-sm text-gray-600">{getGrowthText()}</p>
-				</div>
-				<div className="text-right">
-					<p className="text-sm font-semibold text-blue-600">{companion.totalPoints} pts</p>
-					<p className="text-xs text-gray-600">{companion.streakDays} day streak 🔥</p>
-				</div>
+		<div className="w-full max-w-2xl mx-auto">
+			{/* Title Section */}
+			<div className="text-center mb-8">
+				<h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Meet {companion.name}!</h2>
+				<p className="text-gray-600">
+					Level {companion.level} {companion.stage.charAt(0).toUpperCase() + companion.stage.slice(1)}
+				</p>
 			</div>
 
-			{/* Bear Display with Growth */}
-			<div className="text-center py-6">
-				<div
-					className={`text-7xl sm:text-8xl transition-transform duration-300 ${bearAnimation === "happy" ? "scale-110" : ""}`}>
-					{companion.stage === "cub"
-						? "🐻‍❄️"
-						: companion.stage === "juvenile"
-							? "🐻"
-							: companion.stage === "adolescent"
-								? "🐻"
-								: "🦌"}
+			{/* Bear Display */}
+			<div className="bg-gradient-to-b from-blue-100 to-blue-50 rounded-3xl p-8 sm:p-12 mb-8 flex justify-center items-center min-h-[300px]">
+				<div className="text-center">
+					<PolarBearSVG stage={companion.stage} mood={bearAnimation} />
+					<p className="text-sm text-gray-600 mt-4 font-medium">
+						{companion.stage === "cub" && "🐻‍❄️ A tiny cub learning about the world"}
+						{companion.stage === "juvenile" && "🐻‍❄️ Growing stronger each day!"}
+						{companion.stage === "adolescent" && "🐻‍❄️ A strong young bear"}
+						{companion.stage === "adult" && "🐻‍❄️ A mighty polar bear!"}
+					</p>
 				</div>
-				<p className="text-sm sm:text-base text-gray-600 mt-2 h-5">
-					{bearAnimation === "happy" && "Your bear is so happy! 💕"}
-					{bearAnimation === "hungry" && "Your bear is starving... 🍖"}
-					{bearAnimation === "sad" && "Your bear misses you... 🥺"}
-					{bearAnimation === "sleeping" && "Your bear is taking a nap... 💤"}
-					{bearAnimation === "idle" && "Your bear is waiting for you!"}
-				</p>
-				<p className="text-xs text-purple-600 font-semibold mt-2">
-					{companion.stage === "cub" && "Keep caring for your cub! Level 20 → Juvenile"}
-					{companion.stage === "juvenile" && "Growing strong! Level 40 → Adolescent"}
-					{companion.stage === "adolescent" && "Almost there! Level 60 → Adult"}
-					{companion.stage === "adult" && "Your companion has reached full glory! 👑"}
-				</p>
 			</div>
 
 			{/* Stats Grid */}
-			<div className="grid grid-cols-2 gap-3 mb-6">
+			<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+				{/* Level & XP */}
+				<div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+					<p className="text-xs text-purple-600 font-semibold uppercase mb-1">Level</p>
+					<p className="text-2xl font-bold text-purple-700">{companion.level}</p>
+				</div>
+
+				{/* Experience */}
+				<div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+					<p className="text-xs text-blue-600 font-semibold uppercase mb-1">XP</p>
+					<p className="text-2xl font-bold text-blue-700">
+						{companion.experience}/{100 * companion.level}
+					</p>
+				</div>
+
 				{/* Happiness */}
-				<div>
-					<div className="flex justify-between items-center mb-1">
-						<label className="text-xs font-semibold text-gray-700">Happiness</label>
-						<span className={`text-xs font-bold ${getStatColor(companion.happiness)}`}>{companion.happiness}</span>
-					</div>
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className={`h-2 rounded-full transition-all ${getStatBar(companion.happiness)}`}
-							style={{ width: `${companion.happiness}%` }}
-						/>
-					</div>
+				<div className="bg-pink-50 rounded-xl p-4 border border-pink-200">
+					<p className="text-xs text-pink-600 font-semibold uppercase mb-1">Happiness</p>
+					<p className="text-2xl font-bold text-pink-700">{companion.happiness}%</p>
 				</div>
 
 				{/* Hunger */}
-				<div>
-					<div className="flex justify-between items-center mb-1">
-						<label className="text-xs font-semibold text-gray-700">Hunger</label>
-						<span className={`text-xs font-bold ${getStatColor(100 - companion.hunger)}`}>{companion.hunger}</span>
-					</div>
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className={`h-2 rounded-full transition-all ${getStatBar(100 - companion.hunger)}`}
-							style={{ width: `${100 - companion.hunger}%` }}
-						/>
-					</div>
+				<div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+					<p className="text-xs text-orange-600 font-semibold uppercase mb-1">Hunger</p>
+					<p className="text-2xl font-bold text-orange-700">{companion.hunger}%</p>
 				</div>
 
 				{/* Energy */}
-				<div>
-					<div className="flex justify-between items-center mb-1">
-						<label className="text-xs font-semibold text-gray-700">Energy</label>
-						<span className={`text-xs font-bold ${getStatColor(companion.energy)}`}>{companion.energy}</span>
-					</div>
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className={`h-2 rounded-full transition-all ${getStatBar(companion.energy)}`}
-							style={{ width: `${companion.energy}%` }}
-						/>
-					</div>
+				<div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+					<p className="text-xs text-yellow-600 font-semibold uppercase mb-1">Energy</p>
+					<p className="text-2xl font-bold text-yellow-700">{companion.energy}%</p>
 				</div>
 
-				{/* Health */}
-				<div>
-					<div className="flex justify-between items-center mb-1">
-						<label className="text-xs font-semibold text-gray-700">Health</label>
-						<span className={`text-xs font-bold ${getStatColor(companion.health)}`}>{companion.health}</span>
-					</div>
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className={`h-2 rounded-full transition-all ${getStatBar(companion.health)}`}
-							style={{ width: `${companion.health}%` }}
-						/>
-					</div>
-				</div>
-			</div>
-
-			{/* Adventure Progress */}
-			<div className="mb-6 p-3 bg-white rounded-lg border border-cyan-200">
-				<div className="flex justify-between items-center mb-2">
-					<p className="text-xs font-semibold text-gray-700">
-						Adventure Progress: {companion.currentAdventure || "Waiting for first quest"}
-					</p>
-					<span className="text-xs font-bold text-cyan-600">{companion.adventureProgress}%</span>
-				</div>
-				<div className="w-full bg-gray-200 rounded-full h-3">
-					<div
-						className="h-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all"
-						style={{ width: `${companion.adventureProgress}%` }}
-					/>
+				{/* Total Points */}
+				<div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+					<p className="text-xs text-emerald-600 font-semibold uppercase mb-1">Total Points</p>
+					<p className="text-2xl font-bold text-emerald-700">{companion.totalPoints}</p>
 				</div>
 			</div>
 
 			{/* Action Buttons */}
-			<div className="grid grid-cols-3 gap-2 mb-4">
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
 				<button
 					onClick={handleFeed}
-					className="px-3 py-2 bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-lg text-xs sm:text-sm transition">
+					className="px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold transition duration-200 shadow-md">
 					🍖 Feed
 				</button>
 				<button
 					onClick={handlePlay}
-					className="px-3 py-2 bg-pink-400 hover:bg-pink-500 text-white font-semibold rounded-lg text-xs sm:text-sm transition">
+					className="px-4 py-3 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg font-semibold transition duration-200 shadow-md">
 					🎮 Play
 				</button>
 				<button
 					onClick={handleRest}
-					className="px-3 py-2 bg-purple-400 hover:bg-purple-500 text-white font-semibold rounded-lg text-xs sm:text-sm transition">
+					className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold transition duration-200 shadow-md">
 					😴 Rest
 				</button>
+			</div>
+
+			{/* Status and Info */}
+			<div className="space-y-3 mb-8">
+				<div className="bg-white rounded-lg p-4 border border-gray-200">
+					<p className="text-sm text-gray-600 mb-2 font-semibold">Progress to Next Level:</p>
+					<div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+						<div
+							className="bg-gradient-to-r from-blue-500 to-purple-500 h-full transition-all duration-300"
+							style={{
+								width: `${(companion.experience / (100 * companion.level)) * 100}%`,
+							}}
+						/>
+					</div>
+					<p className="text-xs text-gray-500 mt-2">
+						{companion.experience} / {100 * companion.level} XP
+					</p>
+				</div>
+
+				<div className="grid grid-cols-2 gap-2">
+					<div className="bg-white rounded-lg p-3 border border-gray-200 text-center">
+						<p className="text-xs text-gray-500 font-semibold">Streak</p>
+						<p className="text-lg font-bold text-blue-600">{companion.streakDays} days</p>
+					</div>
+					<div className="bg-white rounded-lg p-3 border border-gray-200 text-center">
+						<p className="text-xs text-gray-500 font-semibold">Current Quest</p>
+						<p className="text-xs font-semibold text-gray-700">{companion.currentAdventure}</p>
+					</div>
+				</div>
 			</div>
 
 			{/* Quest Button */}
 			<button
 				onClick={onQuest}
-				className="w-full px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg transition">
-				📋 View Quests
+				className="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold rounded-lg transition duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+				<span className="text-xl">📋</span>
+				<span>View Quests & Challenges</span>
 			</button>
 
-			{/* XP Progress */}
-			<div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
-				<div className="flex justify-between items-center mb-2">
-					<p className="text-xs font-semibold text-gray-700">Next Level XP</p>
-					<span className="text-xs font-bold text-blue-600">{companion.experience}/1000</span>
+			{/* Evolution Hint */}
+			{companion.level >= 5 && companion.stage === "cub" && (
+				<div className="mt-6 p-4 bg-gradient-to-r from-cyan-100 to-blue-100 border border-blue-300 rounded-lg text-center">
+					<p className="text-sm font-semibold text-blue-900">
+						🎉 Your cub is ready to grow! Keep earning XP to evolve!
+					</p>
 				</div>
-				<div className="w-full bg-gray-200 rounded-full h-2">
-					<div
-						className="h-2 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all"
-						style={{ width: `${(companion.experience / 1000) * 100}%` }}
-					/>
+			)}
+			{companion.level >= 10 && companion.stage === "juvenile" && (
+				<div className="mt-6 p-4 bg-gradient-to-r from-cyan-100 to-blue-100 border border-blue-300 rounded-lg text-center">
+					<p className="text-sm font-semibold text-blue-900">
+						🎉 Your bear is maturing! Reach level 10 for the Adolescent stage!
+					</p>
 				</div>
-			</div>
+			)}
+			{companion.level >= 20 && companion.stage === "adolescent" && (
+				<div className="mt-6 p-4 bg-gradient-to-r from-cyan-100 to-blue-100 border border-blue-300 rounded-lg text-center">
+					<p className="text-sm font-semibold text-blue-900">
+						🎉 Almost there! Reach level 20 to become a mighty Adult bear!
+					</p>
+				</div>
+			)}
 		</div>
 	);
 };

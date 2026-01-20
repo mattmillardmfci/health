@@ -49,11 +49,32 @@ export const MealLogger: React.FC = () => {
 
 		const updated = { ...currentUser, mealLogs: [...mealLogs, meal] };
 
-		// Update quest progress for meal logging - Initialize quests if needed
+		// Update quest progress for meal logging
 		if (Array.isArray(updated.quests)) {
-			updated.quests = updated.quests.map((q: any) =>
-				q.linkedActivity === "meal" ? { ...q, currentProgress: q.currentProgress + 1 } : q,
-			);
+			const todayDate = new Date(selectedDate);
+			todayDate.setHours(0, 0, 0, 0);
+
+			updated.quests = updated.quests.map((q: any) => {
+				if (q.linkedActivity === "meal") {
+					// Count meals logged today
+					const todayMealsCount = [...mealLogs, meal].filter((m) => {
+						const mealDate = new Date(m.date);
+						mealDate.setHours(0, 0, 0, 0);
+						return mealDate.getTime() === todayDate.getTime();
+					}).length;
+
+					const newProgress = todayMealsCount;
+					const isCompleted = newProgress >= q.targetCount;
+
+					return {
+						...q,
+						currentProgress: newProgress,
+						completed: isCompleted,
+						completedDate: isCompleted && !q.completed ? new Date() : q.completedDate,
+					};
+				}
+				return q;
+			});
 		}
 
 		updateUser(updated);

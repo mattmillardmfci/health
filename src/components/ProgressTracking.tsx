@@ -26,6 +26,23 @@ export const ProgressTracking: React.FC = () => {
 			notes: notes || undefined,
 		};
 		const updated = { ...currentUser, weightLogs: [...weightLogs, log] };
+
+		// Update quest progress for weight logging
+		if (Array.isArray(updated.quests)) {
+			updated.quests = updated.quests.map((q: any) => {
+				if (q.linkedActivity === "weight") {
+					const isCompleted = true; // Just logging weight once completes it
+					return {
+						...q,
+						currentProgress: 1,
+						completed: isCompleted,
+						completedDate: isCompleted && !q.completed ? new Date() : q.completedDate,
+					};
+				}
+				return q;
+			});
+		}
+
 		updateUser(updated);
 		setNewWeight("");
 		setNotes("");
