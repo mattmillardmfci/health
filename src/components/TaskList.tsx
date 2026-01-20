@@ -115,7 +115,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 			currentUser.tasks?.map((t) => {
 				if (t.id === taskId) {
 					const updates: Partial<Task> = {
-						completedDate: isCompletingToday ? now : undefined,
+						completedDate: isCompletingToday ? new Date(today) : undefined,
 					};
 					// Only toggle completed flag for non-recurring tasks
 					if (!t.isRecurring) {
