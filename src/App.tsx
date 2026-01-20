@@ -80,48 +80,49 @@ function AppContent() {
 							</div>
 						)}
 
-					{/* Mobile Menu Button */}
-					{currentUser && (
-						<button
-							onClick={() => setMobileNavOpen(!mobileNavOpen)}
-							className="sm:hidden px-3 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition">
-							{mobileNavOpen ? "✕" : "☰"}
-						</button>
-					)}
-				</div>
+						{/* Mobile Menu Button */}
+						{currentUser && (
+							<button
+								onClick={() => setMobileNavOpen(!mobileNavOpen)}
+								className="sm:hidden px-3 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition">
+								{mobileNavOpen ? "✕" : "☰"}
+							</button>
+						)}
+					</div>
 
-				{/* Navigation Buttons */}
-				{currentUser && (
-					<nav className={`${mobileNavOpen ? "block" : "hidden"} sm:block border-t border-blue-100 sm:border-t-0 sm:mt-0 mt-4 pt-4 sm:pt-0`}>
-						<div className="flex flex-wrap gap-2 text-xs sm:text-sm">
-							{[
-								{ view: "home", label: "🏠 Home" },
-								{ view: "companion", label: "🐻‍❄️ Companion" },
-								{ view: "results", label: "💪 Nutrition" },
-								{ view: "progress", label: "📈 Progress" },
-								{ view: "goals", label: "🎯 Goals" },
-								{ view: "meals", label: "🍽️ Meals" },
-								{ view: "activity", label: "🏃 Activity" },
-								{ view: "journal", label: "📔 Journal" },
-								{ view: "supplements", label: "💊 Supplements" },
-								{ view: "analytics", label: "📊 Analytics" },
-								{ view: "recipes", label: "👨‍🍳 Recipes" },
-							].map((item) => (
-								<button
-									key={item.view}
-									onClick={() => {
-										setView(item.view as ViewType);
-										setMobileNavOpen(false);
-									}}
-									className={`block sm:inline-block w-full sm:w-auto text-left px-2.5 sm:px-3 py-2.5 sm:py-1.5 sm:py-2 rounded-lg transition duration-200 font-semibold ${
-										view === item.view ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-									}`}>
-									{item.label}
-								</button>
-							))}
-						</div>
-					</nav>
-				)}
+					{/* Navigation Buttons */}
+					{currentUser && (
+						<nav
+							className={`${mobileNavOpen ? "block" : "hidden"} sm:block border-t border-blue-100 sm:border-t-0 sm:mt-0 mt-4 pt-4 sm:pt-0`}>
+							<div className="flex flex-wrap gap-2 text-xs sm:text-sm">
+								{[
+									{ view: "home", label: "🏠 Home" },
+									{ view: "companion", label: "🐻‍❄️ Companion" },
+									{ view: "results", label: "💪 Nutrition" },
+									{ view: "progress", label: "📈 Progress" },
+									{ view: "goals", label: "🎯 Goals" },
+									{ view: "meals", label: "🍽️ Meals" },
+									{ view: "activity", label: "🏃 Activity" },
+									{ view: "journal", label: "📔 Journal" },
+									{ view: "supplements", label: "💊 Supplements" },
+									{ view: "analytics", label: "📊 Analytics" },
+									{ view: "recipes", label: "👨‍🍳 Recipes" },
+								].map((item) => (
+									<button
+										key={item.view}
+										onClick={() => {
+											setView(item.view as ViewType);
+											setMobileNavOpen(false);
+										}}
+										className={`block sm:inline-block w-full sm:w-auto text-left px-2.5 sm:px-3 py-2.5 sm:py-1.5 sm:py-2 rounded-lg transition duration-200 font-semibold ${
+											view === item.view ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+										}`}>
+										{item.label}
+									</button>
+								))}
+							</div>
+						</nav>
+					)}
 				</div>
 			</header>
 
@@ -145,7 +146,7 @@ function AppContent() {
 							</button>
 						</div>
 						<div className="flex justify-center">
-							<UserProfileForm />
+							<UserProfileForm onProfileCreated={() => setView("results")} />
 						</div>
 					</>
 				) : !currentUser ? (

@@ -3,8 +3,12 @@ import type { User, Gender } from "../types";
 import { useUsers } from "../hooks/useUsers";
 import { generateStarterTasks } from "../utils/starterTasksGenerator";
 
-export const UserProfileForm: React.FC = () => {
-	const { addUser, currentUser, updateUser } = useUsers();
+interface UserProfileFormProps {
+	onProfileCreated?: () => void;
+}
+
+export const UserProfileForm: React.FC<UserProfileFormProps> = ({ onProfileCreated }) => {
+	const { addUser, currentUser, updateUser, setCurrentUser } = useUsers();
 	const [formData, setFormData] = useState<Partial<User>>(
 		currentUser || {
 			name: "",
@@ -119,6 +123,8 @@ export const UserProfileForm: React.FC = () => {
 			updateUser(user);
 		} else {
 			addUser(user);
+			setCurrentUser(user);
+			onProfileCreated?.();
 		}
 	};
 
@@ -196,142 +202,142 @@ export const UserProfileForm: React.FC = () => {
 							</div>
 
 							{/* Height */}
-						<div className="sm:col-span-2">
-							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Height</label>
-							<div className="grid grid-cols-2 gap-3">
-								<div>
-									<label className="block text-xs text-gray-600 mb-1">Feet</label>
-									<input
-										type="number"
-										value={Math.floor((formData.height ?? 70) / 12)}
-										onChange={(e) => {
-											const feet = parseInt(e.target.value) || 5;
-											const inches = (formData.height ?? 70) % 12;
-											setFormData((prev) => ({
-												...prev,
-												height: feet * 12 + inches,
-											}));
-										}}
-										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
-										min="4"
-										max="7"
-									/>
-								</div>
-								<div>
-									<label className="block text-xs text-gray-600 mb-1">Inches</label>
-									<input
-										type="number"
-										value={(formData.height ?? 70) % 12}
-										onChange={(e) => {
-											const inches = Math.min(11, Math.max(0, parseInt(e.target.value) || 0));
-											const feet = Math.floor((formData.height ?? 70) / 12);
-											setFormData((prev) => ({
-												...prev,
-												height: feet * 12 + inches,
-											}));
-										}}
-										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
-										min="0"
-										max="11"
-									/>
-								</div>
-							</div>
-
-							{/* Activity Level */}
-							<div>
-								<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Activity Level</label>
-								<select
-									name="activityLevel"
-									value={formData.activityLevel || "moderately_active"}
-									onChange={handleInputChange}
-									className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
-									<option value="sedentary">Sedentary (little/no exercise)</option>
-									<option value="lightly_active">Lightly Active (1-3 days/week)</option>
-									<option value="moderately_active">Moderately Active (3-5 days/week)</option>
-									<option value="very_active">Very Active (6-7 days/week)</option>
-									<option value="extremely_active">Extremely Active (2x per day)</option>
-								</select>
-							</div>
-
-							{/* Goal */}
-							<div>
-								<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Primary Goal</label>
-								<select
-									name="goal"
-									value={formData.goal || "lose_weight"}
-									onChange={handleInputChange}
-									className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
-									<option value="lose_weight">Lose Weight</option>
-									<option value="maintain">Maintain Weight</option>
-									<option value="gain_weight">Gain Weight</option>
-								</select>
-							</div>
-
-							{/* Weekly Weight Loss Target */}
 							<div className="sm:col-span-2">
-								<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-									Weekly Weight Loss Target
-								</label>
-								<select
-									name="weeklyWeightLossTarget"
-									value={formData.weeklyWeightLossTarget || 1.5}
-									onChange={handleInputChange}
-									className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
-									<option value="0.5">0.5 lbs/week (Conservative)</option>
-									<option value="1">1 lbs/week (Moderate)</option>
-									<option value="1.5">1.5 lbs/week (Aggressive)</option>
-									<option value="2">2 lbs/week (Very Aggressive)</option>
-									<option value="3">3 lbs/week (Extreme)</option>
-								</select>
+								<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Height</label>
+								<div className="grid grid-cols-2 gap-3">
+									<div>
+										<label className="block text-xs text-gray-600 mb-1">Feet</label>
+										<input
+											type="number"
+											value={Math.floor((formData.height ?? 70) / 12)}
+											onChange={(e) => {
+												const feet = parseInt(e.target.value) || 5;
+												const inches = (formData.height ?? 70) % 12;
+												setFormData((prev) => ({
+													...prev,
+													height: feet * 12 + inches,
+												}));
+											}}
+											className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+											min="4"
+											max="7"
+										/>
+									</div>
+									<div>
+										<label className="block text-xs text-gray-600 mb-1">Inches</label>
+										<input
+											type="number"
+											value={(formData.height ?? 70) % 12}
+											onChange={(e) => {
+												const inches = Math.min(11, Math.max(0, parseInt(e.target.value) || 0));
+												const feet = Math.floor((formData.height ?? 70) / 12);
+												setFormData((prev) => ({
+													...prev,
+													height: feet * 12 + inches,
+												}));
+											}}
+											className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+											min="0"
+											max="11"
+										/>
+									</div>
+								</div>
+
+								{/* Activity Level */}
+								<div>
+									<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Activity Level</label>
+									<select
+										name="activityLevel"
+										value={formData.activityLevel || "moderately_active"}
+										onChange={handleInputChange}
+										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+										<option value="sedentary">Sedentary (little/no exercise)</option>
+										<option value="lightly_active">Lightly Active (1-3 days/week)</option>
+										<option value="moderately_active">Moderately Active (3-5 days/week)</option>
+										<option value="very_active">Very Active (6-7 days/week)</option>
+										<option value="extremely_active">Extremely Active (2x per day)</option>
+									</select>
+								</div>
+
+								{/* Goal */}
+								<div>
+									<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Primary Goal</label>
+									<select
+										name="goal"
+										value={formData.goal || "lose_weight"}
+										onChange={handleInputChange}
+										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+										<option value="lose_weight">Lose Weight</option>
+										<option value="maintain">Maintain Weight</option>
+										<option value="gain_weight">Gain Weight</option>
+									</select>
+								</div>
+
+								{/* Weekly Weight Loss Target */}
+								<div className="sm:col-span-2">
+									<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+										Weekly Weight Loss Target
+									</label>
+									<select
+										name="weeklyWeightLossTarget"
+										value={formData.weeklyWeightLossTarget || 1.5}
+										onChange={handleInputChange}
+										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
+										<option value="0.5">0.5 lbs/week (Conservative)</option>
+										<option value="1">1 lbs/week (Moderate)</option>
+										<option value="1.5">1.5 lbs/week (Aggressive)</option>
+										<option value="2">2 lbs/week (Very Aggressive)</option>
+										<option value="3">3 lbs/week (Extreme)</option>
+									</select>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					{/* MENTAL HEALTH SECTION */}
-					<div className="border-t pt-8">
-						<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-							<span className="text-xl">🧠</span> Mental Health Challenges
-						</h3>
-						<p className="text-gray-600 text-sm mb-4">Select any that apply (optional):</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-							{mentalHealthOptions.map((option) => (
-								<button
-									key={option}
-									type="button"
-									onClick={() => handleCheckboxChange("mentalHealthChallenges", option)}
-									className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
-										(formData.mentalHealthChallenges || []).includes(option)
-											? "bg-blue-600 text-white border-blue-600"
-											: "bg-white border-gray-300 text-gray-700 hover:border-blue-400 hover:bg-blue-50"
-									}`}>
-									{option}
-								</button>
-							))}
+						{/* MENTAL HEALTH SECTION */}
+						<div className="border-t pt-8">
+							<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+								<span className="text-xl">🧠</span> Mental Health Challenges
+							</h3>
+							<p className="text-gray-600 text-sm mb-4">Select any that apply (optional):</p>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+								{mentalHealthOptions.map((option) => (
+									<button
+										key={option}
+										type="button"
+										onClick={() => handleCheckboxChange("mentalHealthChallenges", option)}
+										className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
+											(formData.mentalHealthChallenges || []).includes(option)
+												? "bg-blue-600 text-white border-blue-600"
+												: "bg-white border-gray-300 text-gray-700 hover:border-blue-400 hover:bg-blue-50"
+										}`}>
+										{option}
+									</button>
+								))}
+							</div>
 						</div>
-					</div>
 
-					{/* SUPPORT AREAS SECTION */}
-					<div className="border-t pt-8">
-						<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-							<span className="text-xl">🤝</span> Areas You'd Like Support With
-						</h3>
-						<p className="text-gray-600 text-sm mb-4">Select the areas you want to work on:</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-							{supportAreasOptions.map((option) => (
-								<button
-									key={option}
-									type="button"
-									onClick={() => handleCheckboxChange("supportAreas", option)}
-									className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
-										(formData.supportAreas || []).includes(option)
-											? "bg-emerald-600 text-white border-emerald-600"
-											: "bg-white border-gray-300 text-gray-700 hover:border-emerald-400 hover:bg-emerald-50"
-									}`}>
-									{option}
-								</button>
-							))}
+						{/* SUPPORT AREAS SECTION */}
+						<div className="border-t pt-8">
+							<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+								<span className="text-xl">🤝</span> Areas You'd Like Support With
+							</h3>
+							<p className="text-gray-600 text-sm mb-4">Select the areas you want to work on:</p>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+								{supportAreasOptions.map((option) => (
+									<button
+										key={option}
+										type="button"
+										onClick={() => handleCheckboxChange("supportAreas", option)}
+										className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
+											(formData.supportAreas || []).includes(option)
+												? "bg-emerald-600 text-white border-emerald-600"
+												: "bg-white border-gray-300 text-gray-700 hover:border-emerald-400 hover:bg-emerald-50"
+										}`}>
+										{option}
+									</button>
+								))}
+							</div>
 						</div>
-					</div>
 					</div>
 					{/* OVERWHELM TRIGGERS SECTION */}
 					<div className="border-t pt-8">

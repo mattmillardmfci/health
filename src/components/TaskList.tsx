@@ -282,7 +282,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 											? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400"
 											: "bg-white border-2 border-gray-300 hover:border-cyan-400 hover:bg-cyan-50 active:bg-cyan-100"
 									}`}>
-									<div className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center font-bold text-sm"
+									<div
+										className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center font-bold text-sm"
 										style={{
 											borderColor: completedToday ? "#10b981" : "#a3e635",
 											backgroundColor: completedToday ? "#ecfdf5" : "transparent",
