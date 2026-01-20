@@ -121,7 +121,10 @@ export const CompanionHub: React.FC<{
 					<div className="flex flex-col md:flex-row items-center justify-between gap-6">
 						<div className="text-center md:text-left">
 							<h1 className="text-4xl md:text-5xl font-black mb-2">❄️ {companion.name}'s Adventure Hub</h1>
-							<p className="text-cyan-100 text-lg">Level {companion.level} {companion.stage.charAt(0).toUpperCase() + companion.stage.slice(1)} • {companion.totalPoints.toLocaleString()} Points</p>
+							<p className="text-cyan-100 text-lg">
+								Level {companion.level} {companion.stage.charAt(0).toUpperCase() + companion.stage.slice(1)} •{" "}
+								{companion.totalPoints.toLocaleString()} Points
+							</p>
 						</div>
 						{!hasCheckedInToday && (
 							<button
@@ -229,8 +232,12 @@ export const CompanionHub: React.FC<{
 								<h3 className="text-xl font-bold text-gray-800 mb-4">📈 Experience to Next Level</h3>
 								<div className="mb-4">
 									<div className="flex justify-between mb-2">
-										<span className="text-sm font-semibold text-gray-700">{companion.experience} / {100 * companion.level} XP</span>
-										<span className="text-sm font-semibold text-cyan-600">{Math.round((companion.experience / (100 * companion.level)) * 100)}%</span>
+										<span className="text-sm font-semibold text-gray-700">
+											{companion.experience} / {100 * companion.level} XP
+										</span>
+										<span className="text-sm font-semibold text-cyan-600">
+											{Math.round((companion.experience / (100 * companion.level)) * 100)}%
+										</span>
 									</div>
 									<div className="w-full bg-gray-300 rounded-full h-4 overflow-hidden">
 										<div
@@ -260,7 +267,9 @@ export const CompanionHub: React.FC<{
 									</div>
 								) : (
 									<div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-2xl border-2 border-gray-300 text-center">
-										<p className="text-gray-600 font-semibold">No achievements yet. Complete quests and care for your bear to earn badges!</p>
+										<p className="text-gray-600 font-semibold">
+											No achievements yet. Complete quests and care for your bear to earn badges!
+										</p>
 									</div>
 								)}
 							</div>
@@ -270,7 +279,8 @@ export const CompanionHub: React.FC<{
 								<h3 className="text-2xl font-bold text-gray-800 mb-6">🎯 Evolution Milestones</h3>
 								<div className="space-y-4">
 									<div className="flex items-center gap-4 p-4 bg-white rounded-xl border-l-4 border-blue-500">
-										<div className={`w-4 h-4 rounded-full ${companion.level >= 5 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
+										<div
+											className={`w-4 h-4 rounded-full ${companion.level >= 5 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
 										<div className="flex-1">
 											<p className="font-semibold text-gray-800">Reach Level 5</p>
 											<p className="text-sm text-gray-600">Evolve to Juvenile Stage</p>
@@ -279,7 +289,8 @@ export const CompanionHub: React.FC<{
 									</div>
 
 									<div className="flex items-center gap-4 p-4 bg-white rounded-xl border-l-4 border-cyan-500">
-										<div className={`w-4 h-4 rounded-full ${companion.level >= 10 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
+										<div
+											className={`w-4 h-4 rounded-full ${companion.level >= 10 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
 										<div className="flex-1">
 											<p className="font-semibold text-gray-800">Reach Level 10</p>
 											<p className="text-sm text-gray-600">Evolve to Adolescent Stage</p>
@@ -288,7 +299,8 @@ export const CompanionHub: React.FC<{
 									</div>
 
 									<div className="flex items-center gap-4 p-4 bg-white rounded-xl border-l-4 border-indigo-500">
-										<div className={`w-4 h-4 rounded-full ${companion.level >= 20 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
+										<div
+											className={`w-4 h-4 rounded-full ${companion.level >= 20 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
 										<div className="flex-1">
 											<p className="font-semibold text-gray-800">Reach Level 20</p>
 											<p className="text-sm text-gray-600">Evolve to Adult Stage - Ultimate Power!</p>
@@ -297,7 +309,8 @@ export const CompanionHub: React.FC<{
 									</div>
 
 									<div className="flex items-center gap-4 p-4 bg-white rounded-xl border-l-4 border-yellow-500">
-										<div className={`w-4 h-4 rounded-full ${companion.totalPoints >= 1000 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
+										<div
+											className={`w-4 h-4 rounded-full ${companion.totalPoints >= 1000 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
 										<div className="flex-1">
 											<p className="font-semibold text-gray-800">Earn 1,000 Points</p>
 											<p className="text-sm text-gray-600">Become a Points Master!</p>
@@ -306,7 +319,8 @@ export const CompanionHub: React.FC<{
 									</div>
 
 									<div className="flex items-center gap-4 p-4 bg-white rounded-xl border-l-4 border-green-500">
-										<div className={`w-4 h-4 rounded-full ${companion.streakDays >= 30 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
+										<div
+											className={`w-4 h-4 rounded-full ${companion.streakDays >= 30 ? "bg-emerald-500" : "bg-gray-300"} flex-shrink-0`}></div>
 										<div className="flex-1">
 											<p className="font-semibold text-gray-800">30-Day Streak</p>
 											<p className="text-sm text-gray-600">Unstoppable Commitment!</p>
@@ -330,7 +344,9 @@ export const CompanionHub: React.FC<{
 						<h2 className="text-3xl font-black text-center mb-2 bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
 							❄️ Name Your Polar Bear Cub
 						</h2>
-						<p className="text-gray-700 text-center mb-8 font-semibold">What would you like to call your adventure companion?</p>
+						<p className="text-gray-700 text-center mb-8 font-semibold">
+							What would you like to call your adventure companion?
+						</p>
 						<input
 							type="text"
 							value={petName}

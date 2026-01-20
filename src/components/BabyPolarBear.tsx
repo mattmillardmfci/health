@@ -112,7 +112,15 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				</defs>
 
 				{/* Main Body - thick and stocky */}
-				<ellipse cx="50" cy="65" rx={28 * scale} ry={32 * scale} fill="url(#bodyGrad)" stroke="#c0c0c0" strokeWidth="1" />
+				<ellipse
+					cx="50"
+					cy="65"
+					rx={28 * scale}
+					ry={32 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#c0c0c0"
+					strokeWidth="1"
+				/>
 
 				{/* Neck connector */}
 				<rect x="42" y={36 * scale} width={16 * scale} height={8 * scale} rx="4" fill="url(#bodyGrad)" />
@@ -143,7 +151,15 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				<circle cx={65 * scale} cy={10 * scale} r={3 * scale} fill="#ffb3ba" opacity="0.7" />
 
 				{/* Snout/Muzzle - prominent and dark */}
-				<ellipse cx="50" cy={42 * scale} rx={12 * scale} ry={10 * scale} fill="#e8e8e8" stroke="#b0b0b0" strokeWidth="0.8" />
+				<ellipse
+					cx="50"
+					cy={42 * scale}
+					rx={12 * scale}
+					ry={10 * scale}
+					fill="#e8e8e8"
+					stroke="#b0b0b0"
+					strokeWidth="0.8"
+				/>
 
 				{/* Nose - black and prominent */}
 				<ellipse cx="50" cy={44 * scale} rx={3.5 * scale} ry={4 * scale} fill="#000000" />
@@ -159,19 +175,50 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 				{/* Eyebrows - for mood expression */}
 				{mood === "happy" && (
 					<>
-						<path d={`M ${37 * scale} ${22 * scale} Q ${40 * scale} ${20 * scale} ${43 * scale} ${22 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
-						<path d={`M ${57 * scale} ${22 * scale} Q ${60 * scale} ${20 * scale} ${63 * scale} ${22 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
+						<path
+							d={`M ${37 * scale} ${22 * scale} Q ${40 * scale} ${20 * scale} ${43 * scale} ${22 * scale}`}
+							stroke="#999"
+							strokeWidth="1"
+							fill="none"
+							strokeLinecap="round"
+						/>
+						<path
+							d={`M ${57 * scale} ${22 * scale} Q ${60 * scale} ${20 * scale} ${63 * scale} ${22 * scale}`}
+							stroke="#999"
+							strokeWidth="1"
+							fill="none"
+							strokeLinecap="round"
+						/>
 					</>
 				)}
 				{mood === "sad" && (
 					<>
-						<path d={`M ${37 * scale} ${20 * scale} Q ${40 * scale} ${22 * scale} ${43 * scale} ${20 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
-						<path d={`M ${57 * scale} ${20 * scale} Q ${60 * scale} ${22 * scale} ${63 * scale} ${20 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
+						<path
+							d={`M ${37 * scale} ${20 * scale} Q ${40 * scale} ${22 * scale} ${43 * scale} ${20 * scale}`}
+							stroke="#999"
+							strokeWidth="1"
+							fill="none"
+							strokeLinecap="round"
+						/>
+						<path
+							d={`M ${57 * scale} ${20 * scale} Q ${60 * scale} ${22 * scale} ${63 * scale} ${20 * scale}`}
+							stroke="#999"
+							strokeWidth="1"
+							fill="none"
+							strokeLinecap="round"
+						/>
 					</>
 				)}
 
 				{/* Mouth */}
-				<path d={mouthD} stroke="#333" strokeWidth={1.2 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+				<path
+					d={mouthD}
+					stroke="#333"
+					strokeWidth={1.2 * scale}
+					fill="none"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
 
 				{/* Front Paws - realistic and proportional */}
 				{stage !== "cub" && (

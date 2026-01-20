@@ -45,7 +45,18 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	// Filter tasks for today - only recurring tasks or uncompleted today
+	// Get ALL tasks for a category (including completed) to show total count
+	const getAllTasksForCategory = (category: "morning" | "anytime" | "special") => {
+		return tasks.filter((t) => {
+			if (t.category !== category) return false;
+			// For recurring: show all (they reset daily)
+			if (t.isRecurring) return true;
+			// For non-recurring: show all undone
+			return !t.completed;
+		});
+	};
+
+	// Filter tasks for display - only recurring tasks or uncompleted today
 	const getTasksForToday = (category: "morning" | "anytime" | "special") => {
 		return tasks.filter((t) => {
 			if (t.category !== category) return false;
@@ -67,6 +78,11 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 	const morningTasks = useMemo(() => getTasksForToday("morning"), [tasks, today]);
 	const anytimeTasks = useMemo(() => getTasksForToday("anytime"), [tasks, today]);
 	const specialTasks = useMemo(() => getTasksForToday("special"), [tasks, today]);
+
+	// Get all tasks for each category (for total count)
+	const allMorningTasks = useMemo(() => getAllTasksForCategory("morning"), [tasks]);
+	const allAnytimeTasks = useMemo(() => getAllTasksForCategory("anytime"), [tasks]);
+	const allSpecialTasks = useMemo(() => getAllTasksForCategory("special"), [tasks]);
 
 	// Count today's completions for checkpoint
 	const getTodayCompletedCount = (category: "morning" | "anytime") => {
@@ -206,7 +222,8 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 		categoryKey: "morning" | "anytime" | "special";
 		taskList: Task[];
 		completedToday: number;
-	}> = ({ title, icon, categoryKey, taskList, completedToday }) => (
+		totalAvailable: number;
+	}> = ({ title, icon, categoryKey, taskList, completedToday, totalAvailable }) => (
 		<div className="mb-6 bg-white rounded-xl shadow-md overflow-hidden border-2 border-cyan-100">
 			<button
 				onClick={() =>
@@ -216,13 +233,23 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 					}))
 				}
 				className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-cyan-50 transition">
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-3 flex-1">
 					<span className="text-2xl">{icon}</span>
-					<div className="text-left">
+					<div className="text-left flex-1">
 						<h3 className="font-bold text-gray-800 text-sm sm:text-base">{title}</h3>
-						<p className="text-xs text-gray-500">
-							{completedToday} of {taskList.length + completedToday} completed today
-						</p>
+						<div className="flex items-center gap-2">
+							<p className="text-xs text-gray-500">
+								{completedToday} of {totalAvailable} completed today
+							</p>
+							{totalAvailable > 0 && (
+								<div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+									<div
+										className="h-full bg-emerald-500 transition-all duration-300"
+										style={{ width: `${(completedToday / totalAvailable) * 100}%` }}
+									/>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 				<span className={`text-xl transition ${expandedCategories[categoryKey] ? "rotate-180" : ""}`}>▼</span>
@@ -248,21 +275,32 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 							return (
 								<label
 									key={task.id}
-									className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
-										completedToday ? "bg-emerald-50 opacity-60" : "hover:bg-cyan-50"
+									className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform ${
+										completedToday
+											? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400 scale-100"
+											: "hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
 									}`}>
-									<input
-										type="checkbox"
-										checked={completedToday}
-										onChange={() => toggleTask(task.id)}
-										className="w-5 h-5 rounded border-2 border-cyan-400 text-cyan-600 focus:ring-2 focus:ring-cyan-500 cursor-pointer"
-									/>
-									<span className="text-sm sm:text-base text-gray-800 flex-1">
+									<div className="flex-shrink-0">
+										<input
+											type="checkbox"
+											checked={completedToday}
+											onChange={() => toggleTask(task.id)}
+											className="w-6 h-6 rounded border-2 border-cyan-400 text-emerald-600 focus:ring-2 focus:ring-cyan-500 cursor-pointer accent-emerald-600"
+										/>
+									</div>
+									<span
+										className={`text-sm sm:text-base flex-1 ${completedToday ? "line-through text-gray-500" : "text-gray-800 font-medium"}`}>
 										{task.title}
-										{progressText && <span className="text-gray-500 text-xs ml-1">{progressText}</span>}
-										{task.reward && <span className="text-cyan-600 font-bold ml-2">+{task.reward}xp</span>}
+										{progressText && <span className="text-gray-400 text-xs ml-1">{progressText}</span>}
 									</span>
-									{completedToday && <span className="text-emerald-600 text-lg">✓</span>}
+									<div className="flex items-center gap-2 flex-shrink-0">
+										{task.reward && (
+											<span className={`font-bold text-sm ${completedToday ? "text-emerald-600" : "text-cyan-600"}`}>
+												+{task.reward}xp
+											</span>
+										)}
+										{completedToday && <span className="text-emerald-600 text-xl animate-bounce">✓</span>}
+									</div>
 								</label>
 							);
 						})
@@ -292,6 +330,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 				categoryKey="morning"
 				taskList={morningTasks}
 				completedToday={getTodayCompletedCount("morning")}
+				totalAvailable={allMorningTasks.length}
 			/>
 
 			{/* Anytime Tasks */}
@@ -301,16 +340,18 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 				categoryKey="anytime"
 				taskList={anytimeTasks}
 				completedToday={getTodayCompletedCount("anytime")}
+				totalAvailable={allAnytimeTasks.length}
 			/>
 
 			{/* Special Tasks */}
-			{specialTasks.length > 0 && (
+			{allSpecialTasks.length > 0 && (
 				<TaskCategory
 					title="Special Hunts & Evolutions"
 					icon="🎯"
 					categoryKey="special"
 					taskList={specialTasks}
 					completedToday={0}
+					totalAvailable={allSpecialTasks.length}
 				/>
 			)}
 
