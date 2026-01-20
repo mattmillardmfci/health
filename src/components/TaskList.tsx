@@ -273,23 +273,25 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 									: "";
 
 							return (
-								<label
+								<button
 									key={task.id}
-									className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform ${
+									onClick={() => toggleTask(task.id)}
+									type="button"
+									className={`w-full flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform active:scale-95 ${
 										completedToday
-											? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400 scale-100"
-											: "hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
+											? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400"
+											: "bg-white border-2 border-gray-300 hover:border-cyan-400 hover:bg-cyan-50 active:bg-cyan-100"
 									}`}>
-									<div className="flex-shrink-0">
-										<input
-											type="checkbox"
-											checked={completedToday}
-											onChange={() => toggleTask(task.id)}
-											className="w-6 h-6 rounded border-2 border-cyan-400 text-emerald-600 focus:ring-2 focus:ring-cyan-500 cursor-pointer accent-emerald-600"
-										/>
+									<div className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center font-bold text-sm"
+										style={{
+											borderColor: completedToday ? "#10b981" : "#a3e635",
+											backgroundColor: completedToday ? "#ecfdf5" : "transparent",
+											color: completedToday ? "#10b981" : "#a3e635",
+										}}>
+										{completedToday ? "✓" : ""}
 									</div>
 									<span
-										className={`text-sm sm:text-base flex-1 ${completedToday ? "line-through text-gray-500" : "text-gray-800 font-medium"}`}>
+										className={`text-sm sm:text-base flex-1 text-left ${completedToday ? "line-through text-gray-500" : "text-gray-800 font-medium"}`}>
 										{task.title}
 										{progressText && <span className="text-gray-400 text-xs ml-1">{progressText}</span>}
 									</span>
@@ -299,9 +301,9 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 												+{task.reward}xp
 											</span>
 										)}
-										{completedToday && <span className="text-emerald-600 text-xl animate-bounce">✓</span>}
+										{completedToday && <span className="text-emerald-600 text-xl animate-pulse">✓</span>}
 									</div>
-								</label>
+								</button>
 							);
 						})
 					)}

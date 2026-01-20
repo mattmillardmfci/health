@@ -196,18 +196,45 @@ export const UserProfileForm: React.FC = () => {
 							</div>
 
 							{/* Height */}
-							<div>
-								<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Height (inches)</label>
-								<input
-									type="number"
-									name="height"
-									value={formData.height ?? ""}
-									onChange={handleInputChange}
-									className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
-									min="48"
-									max="96"
-									step="0.5"
-								/>
+						<div className="sm:col-span-2">
+							<label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Height</label>
+							<div className="grid grid-cols-2 gap-3">
+								<div>
+									<label className="block text-xs text-gray-600 mb-1">Feet</label>
+									<input
+										type="number"
+										value={Math.floor((formData.height ?? 70) / 12)}
+										onChange={(e) => {
+											const feet = parseInt(e.target.value) || 5;
+											const inches = (formData.height ?? 70) % 12;
+											setFormData((prev) => ({
+												...prev,
+												height: feet * 12 + inches,
+											}));
+										}}
+										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+										min="4"
+										max="7"
+									/>
+								</div>
+								<div>
+									<label className="block text-xs text-gray-600 mb-1">Inches</label>
+									<input
+										type="number"
+										value={(formData.height ?? 70) % 12}
+										onChange={(e) => {
+											const inches = Math.min(11, Math.max(0, parseInt(e.target.value) || 0));
+											const feet = Math.floor((formData.height ?? 70) / 12);
+											setFormData((prev) => ({
+												...prev,
+												height: feet * 12 + inches,
+											}));
+										}}
+										className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base"
+										min="0"
+										max="11"
+									/>
+								</div>
 							</div>
 
 							{/* Activity Level */}
@@ -266,19 +293,19 @@ export const UserProfileForm: React.FC = () => {
 							<span className="text-xl">🧠</span> Mental Health Challenges
 						</h3>
 						<p className="text-gray-600 text-sm mb-4">Select any that apply (optional):</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 							{mentalHealthOptions.map((option) => (
-								<label
+								<button
 									key={option}
-									className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 cursor-pointer transition">
-									<input
-										type="checkbox"
-										checked={(formData.mentalHealthChallenges || []).includes(option)}
-										onChange={() => handleCheckboxChange("mentalHealthChallenges", option)}
-										className="w-5 h-5 rounded border-gray-300 text-blue-600 cursor-pointer"
-									/>
-									<span className="text-sm text-gray-700">{option}</span>
-								</label>
+									type="button"
+									onClick={() => handleCheckboxChange("mentalHealthChallenges", option)}
+									className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
+										(formData.mentalHealthChallenges || []).includes(option)
+											? "bg-blue-600 text-white border-blue-600"
+											: "bg-white border-gray-300 text-gray-700 hover:border-blue-400 hover:bg-blue-50"
+									}`}>
+									{option}
+								</button>
 							))}
 						</div>
 					</div>
@@ -289,42 +316,42 @@ export const UserProfileForm: React.FC = () => {
 							<span className="text-xl">🤝</span> Areas You'd Like Support With
 						</h3>
 						<p className="text-gray-600 text-sm mb-4">Select the areas you want to work on:</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 							{supportAreasOptions.map((option) => (
-								<label
+								<button
 									key={option}
-									className="flex items-center gap-3 p-3 rounded-lg hover:bg-emerald-50 cursor-pointer transition">
-									<input
-										type="checkbox"
-										checked={(formData.supportAreas || []).includes(option)}
-										onChange={() => handleCheckboxChange("supportAreas", option)}
-										className="w-5 h-5 rounded border-gray-300 text-emerald-600 cursor-pointer"
-									/>
-									<span className="text-sm text-gray-700">{option}</span>
-								</label>
+									type="button"
+									onClick={() => handleCheckboxChange("supportAreas", option)}
+									className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
+										(formData.supportAreas || []).includes(option)
+											? "bg-emerald-600 text-white border-emerald-600"
+											: "bg-white border-gray-300 text-gray-700 hover:border-emerald-400 hover:bg-emerald-50"
+									}`}>
+									{option}
+								</button>
 							))}
 						</div>
 					</div>
-
+					</div>
 					{/* OVERWHELM TRIGGERS SECTION */}
 					<div className="border-t pt-8">
 						<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
 							<span className="text-xl">⚡</span> What Tends to Overwhelm You Most?
 						</h3>
 						<p className="text-gray-600 text-sm mb-4">Select what overwhelms you (we'll create targeted support):</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 							{overwhelmTriggersOptions.map((option) => (
-								<label
+								<button
 									key={option}
-									className="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 cursor-pointer transition">
-									<input
-										type="checkbox"
-										checked={(formData.overwhelmTriggers || []).includes(option)}
-										onChange={() => handleCheckboxChange("overwhelmTriggers", option)}
-										className="w-5 h-5 rounded border-gray-300 text-orange-600 cursor-pointer"
-									/>
-									<span className="text-sm text-gray-700">{option}</span>
-								</label>
+									type="button"
+									onClick={() => handleCheckboxChange("overwhelmTriggers", option)}
+									className={`p-3 rounded-lg border-2 font-medium text-sm text-left transition ${
+										(formData.overwhelmTriggers || []).includes(option)
+											? "bg-orange-600 text-white border-orange-600"
+											: "bg-white border-gray-300 text-gray-700 hover:border-orange-400 hover:bg-orange-50"
+									}`}>
+									{option}
+								</button>
 							))}
 						</div>
 					</div>

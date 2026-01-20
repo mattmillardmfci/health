@@ -34,12 +34,13 @@ type ViewType =
 function AppContent() {
 	const { users, currentUser, setCurrentUser } = useUsers();
 	const [view, setView] = useState<ViewType>(!currentUser ? "setup" : "results");
+	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
 			{/* Header */}
 			<header className="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 w-full">
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
 						<div>
 							<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
@@ -78,10 +79,20 @@ function AppContent() {
 								</button>
 							</div>
 						)}
-					</div>
 
-					{/* Navigation Buttons */}
+					{/* Mobile Menu Button */}
 					{currentUser && (
+						<button
+							onClick={() => setMobileNavOpen(!mobileNavOpen)}
+							className="sm:hidden px-3 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition">
+							{mobileNavOpen ? "✕" : "☰"}
+						</button>
+					)}
+				</div>
+
+				{/* Navigation Buttons */}
+				{currentUser && (
+					<nav className={`${mobileNavOpen ? "block" : "hidden"} sm:block border-t border-blue-100 sm:border-t-0 sm:mt-0 mt-4 pt-4 sm:pt-0`}>
 						<div className="flex flex-wrap gap-2 text-xs sm:text-sm">
 							{[
 								{ view: "home", label: "🏠 Home" },
@@ -98,15 +109,19 @@ function AppContent() {
 							].map((item) => (
 								<button
 									key={item.view}
-									onClick={() => setView(item.view as ViewType)}
-									className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition duration-200 font-semibold ${
+									onClick={() => {
+										setView(item.view as ViewType);
+										setMobileNavOpen(false);
+									}}
+									className={`block sm:inline-block w-full sm:w-auto text-left px-2.5 sm:px-3 py-2.5 sm:py-1.5 sm:py-2 rounded-lg transition duration-200 font-semibold ${
 										view === item.view ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
 									}`}>
 									{item.label}
 								</button>
 							))}
 						</div>
-					)}
+					</nav>
+				)}
 				</div>
 			</header>
 
