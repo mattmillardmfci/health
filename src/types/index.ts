@@ -141,8 +141,8 @@ export interface Quest {
 	userId: string;
 	title: string;
 	description: string;
-	type: "daily" | "weekly" | "challenge";
-	linkedActivity: "meal" | "activity" | "journal" | "weight" | "goal";
+	type: "daily" | "weekly" | "challenge" | "task-chain";
+	linkedActivity: "meal" | "activity" | "journal" | "weight" | "goal" | "task";
 	targetCount: number;
 	currentProgress: number;
 	rewardPoints: number;
@@ -150,6 +150,9 @@ export interface Quest {
 	completed: boolean;
 	completedDate?: Date;
 	expiresAt: Date;
+	// For task-chain quests
+	taskCategory?: "morning" | "anytime"; // Which category of tasks to complete
+	requiredTaskCompletions?: number; // e.g., "complete 5 morning tasks"
 }
 
 export interface DailyCheckIn {
@@ -172,8 +175,16 @@ export interface Task {
 	linkedTo?: "meal" | "activity" | "journal" | "weight" | "goal" | "water" | "stretch";
 	completed: boolean;
 	completedDate?: Date;
-	reward?: number; // Points
+	reward?: number; // Points (XP for companion)
 	createdAt: Date;
+	// Persistence & Progression
+	isRecurring: boolean; // Auto-resets daily
+	frequency?: "daily" | "weekly"; // How often it repeats
+	lastCompletedDate?: Date; // Last day this was completed
+	dailyStreak?: number; // Consecutive days completed
+	progressionChainId?: string; // Links to previous task (e.g., 10 pushups -> 20 pushups)
+	progressionValue?: number; // e.g., "10" in "Do 10 pushups"
+	parentTaskId?: string; // Task that created this one
 }
 
 export interface SpecialQuest {
