@@ -117,7 +117,8 @@ export const MealLogger: React.FC = () => {
 
 			// Check for level up (100 XP per level)
 			if (updated.companion.experience >= 100 * updated.companion.level) {
-				updated.companion.level = (updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
+				updated.companion.level =
+					(updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
 				updated.companion.experience = updated.companion.experience % (100 * updated.companion.level);
 			}
 		}
@@ -197,7 +198,8 @@ export const MealLogger: React.FC = () => {
 
 			// Check for level up (100 XP per level)
 			if (updated.companion.experience >= 100 * updated.companion.level) {
-				updated.companion.level = (updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
+				updated.companion.level =
+					(updated.companion.level || 1) + Math.floor(updated.companion.experience / (100 * updated.companion.level));
 				updated.companion.experience = updated.companion.experience % (100 * updated.companion.level);
 			}
 		}

@@ -71,11 +71,50 @@ function AppContent() {
 				</header>
 			)}
 
+			{/* Top Navigation Bar - Desktop only, when user is logged in */}
+			{currentUser && (
+				<nav className="hidden lg:flex sticky top-0 z-40 bg-white border-b border-blue-100 shadow-sm">
+					<div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-2 flex items-center gap-1">
+						{[
+							{ view: "home", label: "🏠 Home" },
+							{ view: "companion", label: "🐻‍❄️ Companion" },
+							{ view: "results", label: "💪 Nutrition" },
+							{ view: "progress", label: "📈 Progress" },
+							{ view: "goals", label: "🎯 Goals" },
+							{ view: "meals", label: "🍽️ Meals" },
+							{ view: "activity", label: "🏃 Activity" },
+							{ view: "journal", label: "📔 Journal" },
+							{ view: "supplements", label: "💊 Supplements" },
+							{ view: "analytics", label: "📊 Analytics" },
+							{ view: "recipes", label: "👨‍🍳 Recipes" },
+						].map((item) => (
+							<button
+								key={item.view}
+								onClick={() => setView(item.view as ViewType)}
+								className={`px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 ${view === item.view ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
+								{item.label}
+							</button>
+						))}
+						<div className="flex-1" />
+						<button
+							onClick={() => setView("setup")}
+							className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
+							✏️ Edit
+						</button>
+						<button
+							onClick={() => setView("settings")}
+							className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
+							⚙️ Settings
+						</button>
+					</div>
+				</nav>
+			)}
+
 			{/* Floating Mobile Menu - Only show when user is logged in */}
 			{currentUser && (
 				<button
 					onClick={() => setMobileNavOpen(!mobileNavOpen)}
-					className="fixed top-4 right-4 z-50 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-bold text-lg shadow-lg transition duration-200">
+					className="lg:hidden fixed top-4 right-4 z-50 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-bold text-lg shadow-lg transition duration-200">
 					{mobileNavOpen ? "✕" : "☰"}
 				</button>
 			)}
@@ -181,8 +220,7 @@ function AppContent() {
 					<CompanionHub
 						onQuestNavigate={(section) => {
 							// Convert quest activity names to view names
-							const viewMap: { [key: string]: ViewType } = {
-								meal: "meals",
+							const viewMap: { [key: string]: ViewType } = {							task: "home",								meal: "meals",
 								activity: "activity",
 								journal: "journal",
 								weight: "progress",
