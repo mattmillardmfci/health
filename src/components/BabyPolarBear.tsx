@@ -67,132 +67,159 @@ export const BabyPolarBear: React.FC<{ onQuest?: () => void }> = ({ onQuest }) =
 		updateUser(updated);
 	};
 
-	// SVG Bear component with size scaling based on stage
+	// SVG Bear component - much more realistic and detailed
 	const PolarBearSVG: React.FC<{ stage: "cub" | "juvenile" | "adolescent" | "adult"; mood: string }> = ({
 		stage,
 		mood,
 	}) => {
 		const sizes = {
-			cub: 100,
-			juvenile: 140,
-			adolescent: 180,
-			adult: 220,
+			cub: 120,
+			juvenile: 160,
+			adolescent: 200,
+			adult: 240,
 		};
 		const size = sizes[stage];
 
-		// Eye expression based on mood
-		const eyeY = mood === "sleeping" ? 25 : 20;
-		const eyeRadius = mood === "sleeping" ? 2 : 4;
+		// Proportions scale with stage
+		const scale = stage === "cub" ? 0.8 : stage === "juvenile" ? 1 : stage === "adolescent" ? 1.2 : 1.4;
+
+		// Eyes & mood
+		const eyeY = mood === "sleeping" ? 32 * scale : 28 * scale;
+		const eyeX1 = 40 * scale;
+		const eyeX2 = 60 * scale;
 
 		// Mouth expression
-		let mouthPath = "M 50 55 Q 50 60 55 60"; // neutral
+		let mouthD = "M 48 50 Q 50 54 52 50"; // neutral smile
 		if (mood === "happy") {
-			mouthPath = "M 45 55 Q 50 62 55 55"; // happy smile
+			mouthD = "M 45 50 Q 50 58 55 50"; // big happy smile
 		} else if (mood === "sad") {
-			mouthPath = "M 45 60 Q 50 55 55 60"; // sad frown
+			mouthD = "M 45 56 Q 50 50 55 56"; // sad frown
 		} else if (mood === "hungry") {
-			mouthPath = "M 48 52 L 50 60 L 52 52"; // surprised O
+			mouthD = "M 50 48 L 50 58 M 47 53 L 53 53"; // surprised open O
 		}
 
-		const bodyRx = stage === "cub" ? 25 : stage === "juvenile" ? 30 : stage === "adolescent" ? 33 : 35;
-		const bodyRy = stage === "cub" ? 28 : stage === "juvenile" ? 32 : stage === "adolescent" ? 35 : 38;
-		const headRad = stage === "cub" ? 20 : stage === "juvenile" ? 25 : stage === "adolescent" ? 28 : 32;
-		const earRad = stage === "cub" ? 8 : stage === "juvenile" ? 10 : stage === "adolescent" ? 11 : 12;
-		const leftEarX = stage === "cub" ? 35 : stage === "juvenile" ? 32 : stage === "adolescent" ? 30 : 28;
-		const rightEarX = stage === "cub" ? 65 : stage === "juvenile" ? 68 : stage === "adolescent" ? 70 : 72;
-		const snoutRx = stage === "cub" ? 12 : stage === "juvenile" ? 14 : stage === "adolescent" ? 16 : 18;
-		const snoutRy = stage === "cub" ? 10 : stage === "juvenile" ? 12 : stage === "adolescent" ? 13 : 15;
-
 		return (
-			<svg width={size} height={size} viewBox="0 0 100 100" className="drop-shadow-lg">
-				{/* Body */}
-				<ellipse cx="50" cy="60" rx={bodyRx} ry={bodyRy} fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+			<svg width={size} height={size} viewBox="0 0 100 100" className="drop-shadow-2xl">
+				<defs>
+					<radialGradient id="bodyGrad" cx="40%" cy="40%">
+						<stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
+						<stop offset="100%" style={{ stopColor: "#f0f0f0", stopOpacity: 1 }} />
+					</radialGradient>
+					<radialGradient id="faceGrad" cx="45%" cy="45%">
+						<stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
+						<stop offset="100%" style={{ stopColor: "#ebebeb", stopOpacity: 1 }} />
+					</radialGradient>
+				</defs>
 
-				{/* Head */}
-				<circle cx="50" cy="30" r={headRad} fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+				{/* Main Body - thick and stocky */}
+				<ellipse cx="50" cy="65" rx={28 * scale} ry={32 * scale} fill="url(#bodyGrad)" stroke="#c0c0c0" strokeWidth="1" />
 
-				{/* Ears */}
+				{/* Neck connector */}
+				<rect x="42" y={36 * scale} width={16 * scale} height={8 * scale} rx="4" fill="url(#bodyGrad)" />
+
+				{/* Head - rounder and bigger for cub appeal */}
+				<circle cx="50" cy={28 * scale} r={18 * scale} fill="url(#faceGrad)" stroke="#c0c0c0" strokeWidth="1" />
+
+				{/* Ears - rounded and positioned higher */}
 				<circle
-					cx={leftEarX}
-					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
-					r={earRad}
-					fill="white"
-					stroke="#e0e0e0"
-					strokeWidth="1.5"
+					cx={35 * scale}
+					cy={10 * scale}
+					r={6 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#c0c0c0"
+					strokeWidth="0.8"
 				/>
 				<circle
-					cx={rightEarX}
-					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
-					r={earRad}
-					fill="white"
-					stroke="#e0e0e0"
-					strokeWidth="1.5"
+					cx={65 * scale}
+					cy={10 * scale}
+					r={6 * scale}
+					fill="url(#bodyGrad)"
+					stroke="#c0c0c0"
+					strokeWidth="0.8"
 				/>
 
-				{/* Inner ears */}
-				<circle
-					cx={leftEarX}
-					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
-					r={stage === "cub" ? 5 : stage === "juvenile" ? 6 : stage === "adolescent" ? 7 : 8}
-					fill="#f5f5f5"
-				/>
-				<circle
-					cx={rightEarX}
-					cy={stage === "cub" ? 15 : stage === "juvenile" ? 12 : stage === "adolescent" ? 10 : 8}
-					r={stage === "cub" ? 5 : stage === "juvenile" ? 6 : stage === "adolescent" ? 7 : 8}
-					fill="#f5f5f5"
-				/>
+				{/* Inner ear details - pink */}
+				<circle cx={35 * scale} cy={10 * scale} r={3 * scale} fill="#ffb3ba" opacity="0.7" />
+				<circle cx={65 * scale} cy={10 * scale} r={3 * scale} fill="#ffb3ba" opacity="0.7" />
 
-				{/* Snout */}
-				<ellipse cx="50" cy="45" rx={snoutRx} ry={snoutRy} fill="#f5f5f5" />
+				{/* Snout/Muzzle - prominent and dark */}
+				<ellipse cx="50" cy={42 * scale} rx={12 * scale} ry={10 * scale} fill="#e8e8e8" stroke="#b0b0b0" strokeWidth="0.8" />
 
-				{/* Eyes */}
-				<circle
-					cx={stage === "cub" ? 43 : stage === "juvenile" ? 42 : stage === "adolescent" ? 41 : 40}
-					cy={eyeY}
-					r={eyeRadius}
-					fill="#333"
-				/>
-				<circle
-					cx={stage === "cub" ? 57 : stage === "juvenile" ? 58 : stage === "adolescent" ? 59 : 60}
-					cy={eyeY}
-					r={eyeRadius}
-					fill="#333"
-				/>
+				{/* Nose - black and prominent */}
+				<ellipse cx="50" cy={44 * scale} rx={3.5 * scale} ry={4 * scale} fill="#000000" />
 
-				{/* Nose */}
-				<circle cx="50" cy="50" r="3" fill="#333" />
+				{/* Eyes - large and expressive */}
+				<circle cx={eyeX1} cy={eyeY} r={3.5 * scale} fill="#1a1a1a" />
+				<circle cx={eyeX2} cy={eyeY} r={3.5 * scale} fill="#1a1a1a" />
 
-				{/* Mouth */}
-				<path d={mouthPath} stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+				{/* Eye shine - adds life to the eyes */}
+				<circle cx={eyeX1 - 1 * scale} cy={eyeY - 1 * scale} r={1 * scale} fill="white" opacity="0.8" />
+				<circle cx={eyeX2 - 1 * scale} cy={eyeY - 1 * scale} r={1 * scale} fill="white" opacity="0.8" />
 
-				{/* Paws - get bigger with stages */}
-				{stage !== "cub" && (
+				{/* Eyebrows - for mood expression */}
+				{mood === "happy" && (
 					<>
-						<ellipse
-							cx={stage === "juvenile" ? 32 : stage === "adolescent" ? 30 : 28}
-							cy="85"
-							rx="10"
-							ry="12"
-							fill="white"
-							stroke="#e0e0e0"
-							strokeWidth="1"
-						/>
-						<ellipse
-							cx={stage === "juvenile" ? 68 : stage === "adolescent" ? 70 : 72}
-							cy="85"
-							rx="10"
-							ry="12"
-							fill="white"
-							stroke="#e0e0e0"
-							strokeWidth="1"
-						/>
+						<path d={`M ${37 * scale} ${22 * scale} Q ${40 * scale} ${20 * scale} ${43 * scale} ${22 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
+						<path d={`M ${57 * scale} ${22 * scale} Q ${60 * scale} ${20 * scale} ${63 * scale} ${22 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
+					</>
+				)}
+				{mood === "sad" && (
+					<>
+						<path d={`M ${37 * scale} ${20 * scale} Q ${40 * scale} ${22 * scale} ${43 * scale} ${20 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
+						<path d={`M ${57 * scale} ${20 * scale} Q ${60 * scale} ${22 * scale} ${63 * scale} ${20 * scale}`} stroke="#999" strokeWidth="1" fill="none" strokeLinecap="round" />
 					</>
 				)}
 
-				{/* Belly spot grows with bear */}
-				{stage === "adolescent" && <ellipse cx="50" cy="65" rx="12" ry="14" fill="#f0f0f0" opacity="0.8" />}
-				{stage === "adult" && <ellipse cx="50" cy="68" rx="15" ry="18" fill="#f0f0f0" opacity="0.8" />}
+				{/* Mouth */}
+				<path d={mouthD} stroke="#333" strokeWidth={1.2 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+
+				{/* Front Paws - realistic and proportional */}
+				{stage !== "cub" && (
+					<>
+						{/* Left paw */}
+						<ellipse
+							cx={32 * scale}
+							cy={85 * scale}
+							rx={8 * scale}
+							ry={11 * scale}
+							fill="url(#bodyGrad)"
+							stroke="#c0c0c0"
+							strokeWidth="0.8"
+						/>
+						{/* Paw pads - left */}
+						<circle cx={32 * scale} cy={90 * scale} r={2 * scale} fill="#ffb3ba" opacity="0.6" />
+
+						{/* Right paw */}
+						<ellipse
+							cx={68 * scale}
+							cy={85 * scale}
+							rx={8 * scale}
+							ry={11 * scale}
+							fill="url(#bodyGrad)"
+							stroke="#c0c0c0"
+							strokeWidth="0.8"
+						/>
+						{/* Paw pads - right */}
+						<circle cx={68 * scale} cy={90 * scale} r={2 * scale} fill="#ffb3ba" opacity="0.6" />
+					</>
+				)}
+
+				{/* Belly spot - grows with bear */}
+				{(stage === "adolescent" || stage === "adult") && (
+					<ellipse cx="50" cy={68 * scale} rx={13 * scale} ry={16 * scale} fill="#e0e0e0" opacity="0.6" />
+				)}
+
+				{/* Claws on paws - visible on larger bears */}
+				{stage !== "cub" && (
+					<>
+						<line x1={32 * scale} y1={92 * scale} x2={32 * scale} y2={96 * scale} stroke="#999" strokeWidth="0.8" />
+						<line x1={68 * scale} y1={92 * scale} x2={68 * scale} y2={96 * scale} stroke="#999" strokeWidth="0.8" />
+					</>
+				)}
+
+				{/* Cheeks - adds cuteness */}
+				<circle cx={28 * scale} cy={32 * scale} r={2.5 * scale} fill="#ffcccc" opacity="0.4" />
+				<circle cx={72 * scale} cy={32 * scale} r={2.5 * scale} fill="#ffcccc" opacity="0.4" />
 			</svg>
 		);
 	};

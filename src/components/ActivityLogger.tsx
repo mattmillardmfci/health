@@ -51,6 +51,35 @@ export const ActivityLogger: React.FC = () => {
 		};
 
 		const updated = { ...currentUser, activityLogs: [...activityLogs, activity] };
+
+		// Update quest progress for activity logging
+		if (Array.isArray(updated.quests)) {
+			const todayDate = new Date(selectedDate);
+			todayDate.setHours(0, 0, 0, 0);
+
+			updated.quests = updated.quests.map((q: any) => {
+				if (q.linkedActivity === "activity") {
+					// Count activities logged today
+					const todayActivityCount = [...activityLogs, activity].filter((a) => {
+						const actDate = new Date(a.date);
+						actDate.setHours(0, 0, 0, 0);
+						return actDate.getTime() === todayDate.getTime();
+					}).length;
+
+					const newProgress = todayActivityCount;
+					const isCompleted = newProgress >= q.targetCount;
+
+					return {
+						...q,
+						currentProgress: newProgress,
+						completed: isCompleted,
+						completedDate: isCompleted && !q.completed ? new Date() : q.completedDate,
+					};
+				}
+				return q;
+			});
+		}
+
 		updateUser(updated);
 		setDuration("");
 		setNotes("");

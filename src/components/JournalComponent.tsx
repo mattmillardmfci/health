@@ -33,6 +33,35 @@ export const JournalComponent: React.FC = () => {
 		};
 
 		const updated = { ...currentUser, journalEntries: [...journalEntries, entry] };
+
+		// Update quest progress for journal entries
+		if (Array.isArray(updated.quests)) {
+			const todayDate = new Date(selectedDate);
+			todayDate.setHours(0, 0, 0, 0);
+
+			updated.quests = updated.quests.map((q: any) => {
+				if (q.linkedActivity === "journal") {
+					// Count journal entries today
+					const todayEntriesCount = [...journalEntries, entry].filter((je) => {
+						const entryDate = new Date(je.date);
+						entryDate.setHours(0, 0, 0, 0);
+						return entryDate.getTime() === todayDate.getTime();
+					}).length;
+
+					const newProgress = todayEntriesCount;
+					const isCompleted = newProgress >= q.targetCount;
+
+					return {
+						...q,
+						currentProgress: newProgress,
+						completed: isCompleted,
+						completedDate: isCompleted && !q.completed ? new Date() : q.completedDate,
+					};
+				}
+				return q;
+			});
+		}
+
 		updateUser(updated);
 		setEntryText("");
 		setEnergyLevel(5);
