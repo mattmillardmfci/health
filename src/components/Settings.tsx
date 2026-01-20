@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
 
-export const Settings: React.FC = () => {
-	const { currentUser, updateUser, users } = useUsers();
+interface SettingsProps {
+	onLogout?: () => void;
+}
+
+export const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
+	const { currentUser, updateUser, users, deleteUser, setCurrentUser } = useUsers();
 	const [showExportModal, setShowExportModal] = useState(false);
 	const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -60,9 +64,14 @@ export const Settings: React.FC = () => {
 	};
 
 	const handleDeleteAccount = () => {
-		const newUsers = users.filter((u) => u.id !== currentUser.id);
-		localStorage.setItem("lifecoachpro-users", JSON.stringify(newUsers));
+		deleteUser(currentUser.id);
+		setShowDeleteConfirm(false);
 		window.location.reload();
+	};
+
+	const handleLogout = () => {
+		setCurrentUser(null);
+		onLogout?.();
 	};
 
 	const handleRecalculateBMR = () => {
@@ -191,8 +200,19 @@ export const Settings: React.FC = () => {
 
 				{/* Account */}
 				<div>
-					<h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Account</h3>
-					<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+					<h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Account</h3>				
+				{/* Logout */}
+				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+					<p className="font-semibold text-gray-800 dark:text-white mb-2">Sign Out</p>
+					<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Log out of {currentUser.name}'s account</p>
+					<button
+						onClick={handleLogout}
+						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+						Log Out
+					</button>
+				</div>
+
+				{/* Delete Account */}					<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
 						<p className="font-semibold text-gray-800 dark:text-white mb-2">Delete Account</p>
 						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 							Permanently delete {currentUser.name}'s account and all associated data. This cannot be undone.

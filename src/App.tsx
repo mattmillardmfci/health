@@ -202,7 +202,10 @@ function AppContent() {
 								<span>Back</span>
 							</button>
 						</div>
-						<Settings />
+						<Settings onLogout={() => {
+							setCurrentUser(null);
+							setView("setup");
+						}} />
 					</>
 				) : null}
 			</main>
