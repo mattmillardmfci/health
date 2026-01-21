@@ -1,278 +1,254 @@
 import React, { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
-import type { User, Task } from "../types";
-import { awardXpToCompanion, checkTaskQuests } from "../utils/taskUtils";
+import type { Task } from "../types";
 
 interface GameDashboardProps {
-	currentUser: User;
-	onNavigate: (view: string) => void;
+	onNavigate?: (section: string) => void;
 }
 
-export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNavigate }) => {
-	const { updateUser } = useUsers();
-	const [localUser, setLocalUser] = useState(currentUser);
+export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
+	const { currentUser, updateUser } = useUsers();
+	const [expandedSection, setExpandedSection] = useState<"morning" | "anytime" | null>("morning");
 
-	// Categorize tasks
-	const morningRoutines = localUser.tasks.filter((t) => t.category === "morning");
-	const anytimeTasks = localUser.tasks.filter((t) => t.category !== "morning");
+	if (!currentUser) return <div className="text-center py-12">Loading...</div>;
 
-	// Get today's date
+	const tasks = currentUser.tasks || [];
+	const morningTasks = tasks.filter((t) => t.category === "morning");
+	const anytimeTasks = tasks.filter((t) => t.category !== "morning");
+
+	// Calculate completed today
 	const today = new Date().toISOString().split("T")[0];
-
-	// Count completed today
-	const completedToday = localUser.tasks.filter((t) => {
-		const completedDate = t.completedDate ? new Date(t.completedDate).toISOString().split("T")[0] : null;
+	const completedToday = tasks.filter((t) => {
+		if (!t.completedDate) return false;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
 		return completedDate === today;
-	}).length;
+	});
 
-	// Handle task completion with XP reward
-	const handleTaskComplete = (task: Task) => {
-		try {
-			const updatedUser = { ...localUser };
-			const taskIndex = updatedUser.tasks.findIndex((t) => t.id === task.id);
-
-			if (taskIndex !== -1) {
-				const xpReward = (task.reward || 10) + 10; // Base 10 + task reward
-
-				// Update task
-				updatedUser.tasks[taskIndex] = {
-					...task,
+	const handleTaskComplete = (taskId: string) => {
+		const updatedTasks = currentUser.tasks.map((t) => {
+			if (t.id === taskId && !t.completed) {
+				return {
+					...t,
 					completed: true,
-					completedDate: new Date(),
+					completedDate: new Date().toISOString(),
 				};
-
-				// Award XP to companion
-				if (updatedUser.companion) {
-					const { companion: updatedCompanion, leveledUp } = awardXpToCompanion(updatedUser.companion, xpReward);
-					updatedUser.companion = updatedCompanion;
-				}
-
-				// Check quests
-				const { updatedQuests } = checkTaskQuests(updatedUser, task.id, false);
-				updatedUser.quests = updatedQuests;
-
-				setLocalUser(updatedUser);
-				updateUser(updatedUser);
 			}
-		} catch (error) {
-			console.error("Error completing task:", error);
-			alert("Error completing task. Please try again.");
-		}
+			return t;
+		});
+
+		const updatedCompanion = {
+			...currentUser.companion,
+			experience: (currentUser.companion.experience || 0) + 15,
+			happiness: Math.min(100, (currentUser.companion.happiness || 80) + 5),
+		};
+
+		updateUser({
+			...currentUser,
+			tasks: updatedTasks,
+			companion: updatedCompanion,
+		});
 	};
 
-	const companion = localUser.companion;
-	const nextLevelXp = 100 * (companion.level || 1);
-	const currentXp = companion.experience || 0;
-	const xpProgress = (currentXp / nextLevelXp) * 100;
+	const goalsForToday = tasks.filter((t) => {
+		if (!t.completedDate) return true;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate !== today;
+	}).length;
 
-	// Get stage emoji
-	const stageEmoji =
-		{
-			cub: "🐻‍❄️",
-			juvenile: "❄️🐻",
-			adolescent: "🐻‍❄️💪",
-			adult: "🐻‍❄️👑",
-		}[companion.stage || "cub"] || "🐻‍❄️";
+	const adventureProgress = Math.min(
+		15,
+		completedToday.filter((t) => t.category === "morning").length +
+			completedToday.filter((t) => t.category !== "morning").length,
+	);
 
 	return (
-		<div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-			{/* Companion Status Card - Game Style */}
-			<div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl shadow-2xl border-4 border-purple-200 p-8 mb-8">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-					{/* Bear Display */}
-					<div className="text-center">
-						<div className="text-8xl mb-4 animate-bounce">{stageEmoji}</div>
-						<h1 className="text-3xl font-black text-slate-800">{companion.name}</h1>
-						<p className="text-slate-600 text-lg mt-2">
-							Level {companion.level || 1} {companion.stage}
-						</p>
-						<p className="text-slate-500 text-sm mt-1">
-							Happiness: {"❤️".repeat(Math.ceil((companion.happiness || 50) / 20))}
-						</p>
-					</div>
-
-					{/* Stats Panel */}
-					<div className="space-y-4">
-						{/* Level Progress */}
-						<div>
-							<div className="flex justify-between items-center mb-2">
-								<span className="font-bold text-slate-800">XP Progress</span>
-								<span className="text-sm text-slate-600">
-									{Math.floor(currentXp)} / {nextLevelXp}
-								</span>
-							</div>
-							<div className="w-full bg-slate-200 rounded-full h-6 overflow-hidden border-2 border-slate-300">
-								<div
-									className="bg-gradient-to-r from-yellow-400 to-orange-500 h-full transition-all duration-500 flex items-center justify-center text-xs font-bold text-white"
-									style={{ width: `${xpProgress}%` }}>
-									{xpProgress > 10 && `${Math.round(xpProgress)}%`}
-								</div>
-							</div>
-						</div>
-
-						{/* Companion Stats Grid */}
-						<div className="grid grid-cols-2 gap-3">
-							<div className="bg-white rounded-xl p-3 border-2 border-red-200">
-								<p className="text-xs text-slate-600">Hunger</p>
-								<div className="text-xl font-bold text-red-600">{companion.hunger || 20}%</div>
-							</div>
-							<div className="bg-white rounded-xl p-3 border-2 border-blue-200">
-								<p className="text-xs text-slate-600">Energy</p>
-								<div className="text-xl font-bold text-blue-600">{companion.energy || 70}%</div>
-							</div>
-							<div className="bg-white rounded-xl p-3 border-2 border-green-200">
-								<p className="text-xs text-slate-600">Health</p>
-								<div className="text-xl font-bold text-green-600">{companion.health || 90}%</div>
-							</div>
-							<div className="bg-white rounded-xl p-3 border-2 border-purple-200">
-								<p className="text-xs text-slate-600">Cleanliness</p>
-								<div className="text-xl font-bold text-purple-600">{companion.cleanliness || 80}%</div>
-							</div>
-						</div>
-					</div>
+		<div className="min-h-screen bg-gradient-to-b from-cyan-200 via-cyan-100 to-blue-100 pb-32">
+			{/* Polar Scene Header */}
+			<div className="relative h-64 bg-gradient-to-b from-cyan-300 via-cyan-200 to-cyan-100 overflow-hidden">
+				{/* Sky/Snow particles effect */}
+				<div className="absolute inset-0 opacity-30">
+					<div className="absolute w-20 h-20 bg-white rounded-full blur-xl" style={{ top: "20%", left: "10%" }} />
+					<div className="absolute w-32 h-32 bg-white rounded-full blur-2xl" style={{ top: "10%", right: "15%" }} />
+					<div className="absolute w-16 h-16 bg-white rounded-full blur-lg" style={{ bottom: "30%", left: "20%" }} />
 				</div>
+
+				{/* Ice blocks/snowdrifts */}
+				<div className="absolute bottom-0 left-0 w-32 h-24 bg-cyan-300 rounded-lg opacity-40 transform -skew-x-12" />
+				<div className="absolute bottom-0 right-0 w-40 h-20 bg-blue-200 rounded-lg opacity-50 transform skew-x-12" />
+
+				{/* Igloo/Ice structure */}
+				<div className="absolute bottom-0 left-1/4 w-20 h-20 bg-gradient-to-b from-blue-100 to-blue-300 rounded-full opacity-50" />
+				<div className="absolute bottom-0 left-1/4 transform translate-x-2 w-6 h-10 bg-blue-400 rounded opacity-60" />
+
+				{/* Companion */}
+				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-8xl drop-shadow-lg animate-bounce">
+					🐻‍❄️
+				</div>
+
+				{/* Menu button */}
+				<button className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-md hover:bg-white transition">
+					<span className="text-2xl">☰</span>
+				</button>
+
+				{/* Settings button */}
+				<button className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-md hover:bg-white transition">
+					<span className="text-2xl">⚙️</span>
+				</button>
 			</div>
 
-			{/* Daily Challenge Section */}
-			<div className="mb-8">
-				<h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-					<span>🎮</span> Daily Challenges
-				</h2>
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-					<div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300">
-						<p className="text-sm text-slate-600 mb-2">Morning Champion</p>
-						<p className="text-2xl font-bold text-blue-700">3/5</p>
-						<p className="text-xs text-slate-500 mt-2">Complete 5 morning routines</p>
+			{/* Content Area */}
+			<div className="relative px-4 py-6 max-w-2xl mx-auto">
+				{/* Adventure Progress */}
+				<div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 mb-6 shadow-lg border border-white/40">
+					<div className="flex items-center gap-3 mb-3">
+						<span className="text-2xl">⚡</span>
+						<h3 className="font-bold text-slate-800">1st Adventure</h3>
 					</div>
-					<div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-2 border-emerald-300">
-						<p className="text-sm text-slate-600 mb-2">Task Master</p>
-						<p className="text-2xl font-bold text-emerald-700">{completedToday}/10</p>
-						<p className="text-xs text-slate-500 mt-2">Complete 10 tasks today</p>
-					</div>
-					<div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300">
-						<p className="text-sm text-slate-600 mb-2">Streak Bonus</p>
-						<p className="text-2xl font-bold text-purple-700">{companion.streakDays || 0} 🔥</p>
-						<p className="text-xs text-slate-500 mt-2">Days in a row</p>
-					</div>
-				</div>
-			</div>
-
-			{/* Tasks Grid - Game Style */}
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				{/* Morning Routines */}
-				<div>
-					<h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-						<span>🌅</span> Morning Routines
-					</h3>
-					<div className="space-y-3">
-						{morningRoutines.slice(0, 5).map((task) => (
-							<TaskCard
-								key={task.id}
-								task={task}
-								onComplete={() => handleTaskComplete(task)}
-								xpReward={(task.reward || 10) + 10}
+					<div className="flex items-center gap-3">
+						<div className="flex-1 bg-orange-200 rounded-full h-3 overflow-hidden">
+							<div
+								className="bg-gradient-to-r from-orange-400 to-orange-500 h-full transition-all"
+								style={{ width: `${(adventureProgress / 15) * 100}%` }}
 							/>
-						))}
-						{morningRoutines.length === 0 && (
-							<p className="text-slate-500 text-sm p-4 bg-slate-50 rounded-lg">No morning tasks yet</p>
-						)}
+						</div>
+						<span className="font-bold text-slate-700 text-sm">{adventureProgress} / 15</span>
 					</div>
 				</div>
 
-				{/* Anytime Tasks */}
-				<div>
-					<h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-						<span>⭐</span> Quests
-					</h3>
-					<div className="space-y-3">
-						{anytimeTasks
-							.filter((t) => !t.title?.includes("morning"))
-							.slice(0, 5)
-							.map((task) => (
-								<TaskCard
-									key={task.id}
-									task={task}
-									onComplete={() => handleTaskComplete(task)}
-									xpReward={(task.reward || 10) + 10}
-								/>
-							))}
-						{anytimeTasks.filter((t) => !t.title?.includes("morning")).length === 0 && (
-							<p className="text-slate-500 text-sm p-4 bg-slate-50 rounded-lg">No quests yet</p>
-						)}
+				{/* Goals Counter */}
+				<div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 mb-6 shadow-lg border border-white/40">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-3">
+							<span className="text-2xl">📋</span>
+							<h3 className="font-bold text-slate-800">{goalsForToday} goals left for today!</h3>
+						</div>
+						<div className="flex gap-2">
+							<button className="p-2 hover:bg-white/40 rounded-lg transition">
+								<span className="text-xl">🎚️</span>
+							</button>
+							<button className="p-2 hover:bg-white/40 rounded-lg transition">
+								<span className="text-xl">👥</span>
+							</button>
+						</div>
 					</div>
+				</div>
+
+				{/* Morning Routines Section */}
+				<div className="mb-6">
 					<button
-						onClick={() => onNavigate("tasks")}
-						className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105">
-						📋 View All Tasks
+						onClick={() => setExpandedSection(expandedSection === "morning" ? null : "morning")}
+						className="w-full flex items-center justify-between bg-white/60 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition border border-white/40 mb-3">
+						<span className="font-bold text-slate-800">Start the day</span>
+						<span className={`text-xl transition ${expandedSection === "morning" ? "rotate-180" : ""}`}>▼</span>
 					</button>
+
+					{expandedSection === "morning" && (
+						<div className="space-y-3">
+							{morningTasks.length === 0 ? (
+								<p className="text-slate-600 text-center py-4">No morning tasks yet. Add one to get started!</p>
+							) : (
+								morningTasks.map((task) => (
+									<div
+										key={task.id}
+										className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
+										<div className="flex items-center gap-4 flex-1">
+											<span className="text-3xl">{task.emoji || "⭐"}</span>
+											<div className="flex-1">
+												<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+												<div className="flex items-center gap-2 mt-1">
+													<span className="text-orange-500 font-bold">⚡</span>
+													<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+												</div>
+											</div>
+										</div>
+										<button
+											onClick={() => handleTaskComplete(task.id)}
+											disabled={task.completed}
+											className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
+												task.completed
+													? "bg-green-200 text-green-700 cursor-default"
+													: "bg-gray-200 text-gray-600 hover:bg-gray-300"
+											}`}>
+											{task.completed ? "✓" : "○"}
+										</button>
+									</div>
+								))
+							)}
+						</div>
+					)}
+				</div>
+
+				{/* Anytime Tasks Section */}
+				<div className="mb-6">
+					<button
+						onClick={() => setExpandedSection(expandedSection === "anytime" ? null : "anytime")}
+						className="w-full flex items-center justify-between bg-white/60 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition border border-white/40 mb-3">
+						<span className="font-bold text-slate-800">Anytime tasks</span>
+						<span className={`text-xl transition ${expandedSection === "anytime" ? "rotate-180" : ""}`}>▼</span>
+					</button>
+
+					{expandedSection === "anytime" && (
+						<div className="space-y-3">
+							{anytimeTasks.length === 0 ? (
+								<p className="text-slate-600 text-center py-4">No anytime tasks yet. Add one to get started!</p>
+							) : (
+								anytimeTasks.map((task) => (
+									<div
+										key={task.id}
+										className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
+										<div className="flex items-center gap-4 flex-1">
+											<span className="text-3xl">{task.emoji || "⭐"}</span>
+											<div className="flex-1">
+												<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+												<div className="flex items-center gap-2 mt-1">
+													<span className="text-orange-500 font-bold">⚡</span>
+													<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+												</div>
+											</div>
+										</div>
+										<button
+											onClick={() => handleTaskComplete(task.id)}
+											disabled={task.completed}
+											className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
+												task.completed
+													? "bg-green-200 text-green-700 cursor-default"
+													: "bg-gray-200 text-gray-600 hover:bg-gray-300"
+											}`}>
+											{task.completed ? "✓" : "○"}
+										</button>
+									</div>
+								))
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 
-			{/* Power-ups & Actions */}
-			<div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-				<button
-					onClick={() => onNavigate("companion")}
-					className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-2xl p-4 font-bold hover:shadow-lg transition transform hover:scale-105 text-center">
-					<div className="text-2xl mb-2">🐻‍❄️</div>
-					<div className="text-sm">Companion</div>
-				</button>
-				<button
-					onClick={() => onNavigate("meals")}
-					className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl p-4 font-bold hover:shadow-lg transition transform hover:scale-105 text-center">
-					<div className="text-2xl mb-2">🍽️</div>
-					<div className="text-sm">Meals</div>
-				</button>
-				<button
-					onClick={() => onNavigate("results")}
-					className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-4 font-bold hover:shadow-lg transition transform hover:scale-105 text-center">
-					<div className="text-2xl mb-2">💪</div>
-					<div className="text-sm">Nutrition</div>
-				</button>
-				<button
-					onClick={() => onNavigate("activity")}
-					className="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl p-4 font-bold hover:shadow-lg transition transform hover:scale-105 text-center">
-					<div className="text-2xl mb-2">🏃</div>
-					<div className="text-sm">Activity</div>
-				</button>
+			{/* Bottom Navigation */}
+			<div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-green-400 via-green-300 to-green-200 border-t-4 border-green-500 shadow-2xl rounded-t-3xl">
+				<div className="flex justify-around items-center py-4 px-4 max-w-2xl mx-auto w-full">
+					{[
+						{ icon: "🏠", label: "Home", active: true },
+						{ icon: "📋", label: "Quests", active: false },
+						{ icon: "🏪", label: "Shop", active: false },
+						{ icon: "👥", label: "Friends", active: false },
+						{ icon: "🎒", label: "Bag", active: false },
+						{ icon: "🐻‍❄️", label: "Goose", active: false },
+					].map((item) => (
+						<button
+							key={item.label}
+							className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition transform hover:scale-110 active:scale-95 ${
+								item.active ? "bg-white/40 text-white font-bold" : "text-white/60 hover:text-white/80"
+							}`}
+							onClick={() => onNavigate?.(item.label.toLowerCase())}>
+							<span className="text-2xl">{item.icon}</span>
+							<span className="text-xs font-semibold">{item.label}</span>
+						</button>
+					))}
+				</div>
 			</div>
 		</div>
 	);
 };
-
-interface TaskCardProps {
-	task: Task;
-	onComplete: () => void;
-	xpReward: number;
-}
-
-function TaskCard({ task, onComplete, xpReward }: TaskCardProps) {
-	return (
-		<div
-			className={`p-4 rounded-xl border-2 transition transform hover:scale-102 ${
-				task.completed
-					? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-300"
-					: "bg-white border-slate-300 hover:shadow-lg"
-			}`}>
-			<div className="flex items-center gap-3">
-				<button
-					onClick={onComplete}
-					disabled={task.completed}
-					className={`flex-shrink-0 w-8 h-8 rounded-lg font-bold text-lg transition ${
-						task.completed ? "bg-green-500 text-white" : "bg-slate-200 hover:bg-blue-400 hover:text-white"
-					}`}>
-					{task.completed ? "✓" : "○"}
-				</button>
-				<div className="flex-1 min-w-0">
-					<p className={`font-semibold text-sm ${task.completed ? "line-through text-slate-500" : "text-slate-800"}`}>
-						{task.title}
-					</p>
-				</div>
-				<div className="text-right flex-shrink-0">
-					<div className="text-xs font-bold text-yellow-600">+{xpReward} XP</div>
-				</div>
-			</div>
-		</div>
-	);
-}
 
 export default GameDashboard;

@@ -16,6 +16,7 @@ import { CloudSyncSettings } from "./components/CloudSyncSettings";
 import { CompanionHub } from "./components/CompanionHub";
 import { TaskList } from "./components/TaskList";
 import { GameDashboard } from "./components/GameDashboard";
+import { StreakWelcomePage } from "./components/StreakWelcomePage";
 import { LoginScreen } from "./components/LoginScreen";
 import { SplashScreen } from "./components/SplashScreen";
 import { OnboardingWizard } from "./components/OnboardingWizard";
@@ -25,6 +26,7 @@ import "./App.css";
 type ViewType =
 	| "setup"
 	| "home"
+	| "streak-welcome"
 	| "results"
 	| "recipes"
 	| "progress"
@@ -46,6 +48,7 @@ function AppContent() {
 	const [view, setView] = useState<ViewType>("home");
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 	const [onboardingStage, setOnboardingStage] = useState<"splash" | "wizard" | "login">("splash");
+	const [showStreakWelcome, setShowStreakWelcome] = useState(false);
 
 	// Initialize on mount after context is hydrated
 	React.useEffect(() => {
@@ -86,7 +89,7 @@ function AppContent() {
 			return (
 				<OnboardingWizard
 					onCompleted={() => {
-						setView("home");
+						setShowStreakWelcome(true);
 					}}
 				/>
 			);
@@ -109,6 +112,18 @@ function AppContent() {
 					<p className="text-slate-600 animate-pulse">Loading your polar bear...</p>
 				</div>
 			</div>
+		);
+	}
+
+	// Show streak welcome page if just completed onboarding
+	if (showStreakWelcome && currentUser) {
+		return (
+			<StreakWelcomePage
+				onContinue={() => {
+					setShowStreakWelcome(false);
+					setView("home");
+				}}
+			/>
 		);
 	}
 
@@ -267,7 +282,7 @@ function AppContent() {
 						</div>
 					</div>
 				) : view === "home" ? (
-					<GameDashboard currentUser={currentUser} onNavigate={(newView) => setView(newView)} />
+					<GameDashboard onNavigate={(newView) => setView(newView as ViewType)} />
 				) : view === "results" ? (
 					<NutritionResults user={currentUser} />
 				) : view === "companion" ? (

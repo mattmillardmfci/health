@@ -7,26 +7,31 @@ interface OnboardingWizardProps {
 	onCompleted: () => void;
 }
 
-type Step = 0 | 1 | 2 | 3 | 4;
+type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
 export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted }) => {
 	const { addUser } = useUsers();
 	const [step, setStep] = useState<Step>(0);
+
+	// User profile
 	const [name, setName] = useState("");
-	const [cubName, setCubName] = useState("");
 	const [ageRange, setAgeRange] = useState<string>("");
 	const [gender, setGender] = useState<"male" | "female" | "other" | null>(null);
 	const [activity, setActivity] = useState<
 		"sedentary" | "lightly_active" | "moderately_active" | "very_active" | "extremely_active"
 	>("lightly_active");
 	const [supportAreas, setSupportAreas] = useState<string[]>([]);
+
+	// Cub profile
+	const [cubName, setCubName] = useState("");
+
 	const [error, setError] = useState("");
 
 	const toggleSupportArea = (area: string) => {
 		setSupportAreas((prev) => (prev.includes(area) ? prev.filter((a) => a !== area) : [...prev, area]));
 	};
 
-	const next = () => setStep((s) => Math.min(s + 1, 4) as Step);
+	const next = () => setStep((s) => Math.min(s + 1, 5) as Step);
 	const back = () => setStep((s) => Math.max(s - 1, 0) as Step);
 
 	const createUser = () => {
@@ -113,56 +118,44 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 				<div className="p-6">
 					{/* Progress */}
 					<div className="flex items-center gap-2 mb-6">
-						{[0, 1, 2, 3, 4].map((idx) => (
-							<div key={idx} className={`h-2 flex-1 rounded-full ${idx <= step ? "bg-emerald-500" : "bg-slate-200"}`} />
+						{[0, 1, 2, 3, 4, 5].map((idx) => (
+							<div
+								key={idx}
+								className={`h-3 flex-1 rounded-full transition ${idx === step ? "bg-emerald-500" : idx < step ? "bg-emerald-300" : "bg-slate-200"}`}
+							/>
 						))}
 					</div>
 
 					{/* Steps */}
 					{step === 0 && (
 						<div className="animate-slide-in">
-							<h2 className="text-2xl font-bold text-slate-800 mb-2">A new cub is born! 🐻‍❄️</h2>
-						<p className="text-slate-600 mb-6">Tell us about you and your new cub.</p>
-						
-						<div className="space-y-4">
+							<h2 className="text-2xl font-bold text-slate-800 mb-2">Welcome! 👋</h2>
+							<p className="text-slate-600 mb-6">Let's get to know you first.</p>
+
 							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-2">Your Name</label>
+								<label className="block text-sm font-semibold text-slate-700 mb-2">What's your name?</label>
 								<input
 									value={name}
 									onChange={(e) => setName(e.target.value)}
 									onKeyPress={(e) => {
-										if (e.key === "Enter" && name.trim() && cubName.trim()) next();
+										if (e.key === "Enter" && name.trim()) next();
 									}}
 									placeholder="e.g., Matt"
 									className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
 									autoFocus
 								/>
 							</div>
-							
-							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-2">Cub's Name</label>
-								<input
-									value={cubName}
-									onChange={(e) => setCubName(e.target.value)}
-									onKeyPress={(e) => {
-										if (e.key === "Enter" && name.trim() && cubName.trim()) next();
-									}}
-									placeholder="e.g., Snowy"
-									className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
-								/>
+
+							{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
+							<div className="mt-6 flex justify-end">
+								<button
+									onClick={next}
+									disabled={!name.trim()}
+									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed">
+									Next
+								</button>
 							</div>
 						</div>
-						
-						{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
-						<div className="mt-6 flex justify-end">
-							<button
-								onClick={next}
-								disabled={!name.trim() || !cubName.trim()}
-								className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed">
-								Next
-							</button>
-						</div>
-					</div>
 					)}
 
 					{step === 1 && (
@@ -262,8 +255,10 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 
 					{step === 4 && (
 						<div className="animate-slide-in">
-							<h2 className="text-xl font-bold text-slate-800 mb-2">Goals & Support Areas</h2>
-							<p className="text-slate-600 mb-4">Choose what you'd like help with. We'll start you with tasks.</p>
+							<h2 className="text-xl font-bold text-slate-800 mb-2">What Would Help You Most?</h2>
+							<p className="text-slate-600 mb-4">
+								Choose areas where you'd like support. We'll personalize your tasks.
+							</p>
 							<div className="grid grid-cols-2 gap-3">
 								{[
 									"Be more active",
@@ -287,8 +282,48 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
 									Back
 								</button>
-								<button onClick={createUser} className="px-4 py-2 rounded-lg bg-emerald-600 text-white shadow">
-									Finish
+								<button
+									onClick={next}
+									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600">
+									Next
+								</button>
+							</div>
+						</div>
+					)}
+
+					{step === 5 && (
+						<div className="animate-slide-in">
+							<h2 className="text-2xl font-bold text-slate-800 mb-2">Now, let's create your cub! 🐻‍❄️</h2>
+							<p className="text-slate-600 mb-6">Name your polar bear companion who will grow with you.</p>
+
+							<div>
+								<label className="block text-sm font-semibold text-slate-700 mb-2">Cub's Name</label>
+								<input
+									value={cubName}
+									onChange={(e) => setCubName(e.target.value)}
+									onKeyPress={(e) => {
+										if (e.key === "Enter" && cubName.trim()) createUser();
+									}}
+									placeholder="e.g., Snowy"
+									className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
+									autoFocus
+								/>
+							</div>
+
+							<p className="text-sm text-slate-600 mt-4">
+								Your cub will level up as you complete tasks and reach your goals.
+							</p>
+
+							{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
+							<div className="mt-6 flex justify-between">
+								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+									Back
+								</button>
+								<button
+									onClick={createUser}
+									disabled={!cubName.trim()}
+									className="px-4 py-2 rounded-lg bg-emerald-600 text-white shadow hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+									Create & Begin
 								</button>
 							</div>
 						</div>
