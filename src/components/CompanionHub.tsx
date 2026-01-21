@@ -415,7 +415,7 @@ export const CompanionHub: React.FC<{
 							type="text"
 							value={petName}
 							onChange={(e) => setPetName(e.target.value)}
-							placeholder="e.g., Snowball, Frostbite, Aurora"
+						placeholder="e.g., Fluffy, Snowy, Bitey, Snowball, Frostbite, Aurora"
 							maxLength={20}
 							className="w-full px-4 py-3 border-2 border-cyan-400 rounded-xl focus:ring-4 focus:ring-cyan-300 focus:border-transparent mb-6 font-semibold text-lg"
 							onKeyDown={(e) => e.key === "Enter" && petName.trim() && handlePetNaming(petName)}
