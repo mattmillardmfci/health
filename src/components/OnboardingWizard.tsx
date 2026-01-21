@@ -120,14 +120,19 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 							<input
 								value={name}
 								onChange={(e) => setName(e.target.value)}
+								onKeyPress={(e) => {
+									if (e.key === "Enter" && name.trim()) next();
+								}}
 								placeholder="e.g., Snowy"
 								className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
+								autoFocus
 							/>
 							{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
 							<div className="mt-6 flex justify-end">
 								<button
 									onClick={next}
-									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600">
+									disabled={!name.trim()}
+									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed">
 									Next
 								</button>
 							</div>
@@ -160,12 +165,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 									</button>
 								))}
 							</div>
-							<div className="mt-6 flex justify-between">
+							<div className="mt-6 flex justify-start">
 								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
 									Back
-								</button>
-								<button onClick={next} className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow">
-									Next
 								</button>
 							</div>
 						</div>
@@ -182,7 +184,10 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 								].map((opt) => (
 									<button
 										key={opt.value}
-										onClick={() => setGender(opt.value as any)}
+										onClick={() => {
+											setGender(opt.value as any);
+											next();
+										}}
 										className={`px-4 py-3 rounded-xl border shadow-sm transition ${
 											gender === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
 										}`}>
@@ -190,12 +195,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 									</button>
 								))}
 							</div>
-							<div className="mt-6 flex justify-between">
+							<div className="mt-6 flex justify-start">
 								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
 									Back
-								</button>
-								<button onClick={next} className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow">
-									Next
 								</button>
 							</div>
 						</div>
@@ -213,7 +215,10 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 								].map((opt) => (
 									<button
 										key={opt.value}
-										onClick={() => setActivity(opt.value as any)}
+										onClick={() => {
+											setActivity(opt.value as any);
+											next();
+										}}
 										className={`w-full text-left px-4 py-3 rounded-xl border shadow-sm transition ${
 											activity === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
 										}`}>
@@ -221,12 +226,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 									</button>
 								))}
 							</div>
-							<div className="mt-6 flex justify-between">
+							<div className="mt-6 flex justify-start">
 								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
 									Back
-								</button>
-								<button onClick={next} className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow">
-									Next
 								</button>
 							</div>
 						</div>
