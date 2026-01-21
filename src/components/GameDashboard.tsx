@@ -25,6 +25,31 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 		return completedDate === today;
 	});
 
+	// Separate tasks into pending and completed
+	const pendingMorningTasks = morningTasks.filter((t) => {
+		if (!t.completedDate) return true;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate !== today;
+	});
+
+	const completedMorningTasks = morningTasks.filter((t) => {
+		if (!t.completedDate) return false;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate === today;
+	});
+
+	const pendingAnytimeTasks = anytimeTasks.filter((t) => {
+		if (!t.completedDate) return true;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate !== today;
+	});
+
+	const completedAnytimeTasks = anytimeTasks.filter((t) => {
+		if (!t.completedDate) return false;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate === today;
+	});
+
 	const handleTaskComplete = (taskId: string) => {
 		const updatedTasks = currentUser.tasks.map((t) => {
 			if (t.id === taskId && !t.completed) {
@@ -50,17 +75,17 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 		});
 	};
 
-	const goalsForToday = tasks.filter((t) => {
-		if (!t.completedDate) return true;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate !== today;
-	}).length;
-
 	const adventureProgress = Math.min(
 		15,
 		completedToday.filter((t) => t.category === "morning").length +
 			completedToday.filter((t) => t.category !== "morning").length,
 	);
+
+	const goalsForToday = tasks.filter((t) => {
+		if (!t.completedDate) return true;
+		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
+		return completedDate !== today;
+	}).length;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-cyan-200 via-cyan-100 to-blue-100 pb-32">
@@ -145,35 +170,70 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 
 					{expandedSection === "morning" && (
 						<div className="space-y-3">
-							{morningTasks.length === 0 ? (
+							{/* Pending Morning Tasks */}
+							{pendingMorningTasks.length === 0 && completedMorningTasks.length === 0 ? (
 								<p className="text-slate-600 text-center py-4">No morning tasks yet. Add one to get started!</p>
 							) : (
-								morningTasks.map((task) => (
-									<div
-										key={task.id}
-										className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
-										<div className="flex items-center gap-4 flex-1">
-											<span className="text-3xl">{task.emoji || "⭐"}</span>
-											<div className="flex-1">
-												<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
-												<div className="flex items-center gap-2 mt-1">
-													<span className="text-orange-500 font-bold">⚡</span>
-													<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
-												</div>
+								<>
+									{pendingMorningTasks.length > 0 && (
+										<div>
+											<h5 className="text-xs font-semibold text-slate-600 px-2 py-1">TO DO</h5>
+											<div className="space-y-2">
+												{pendingMorningTasks.map((task) => (
+													<div
+														key={task.id}
+														className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
+														<div className="flex items-center gap-4 flex-1">
+															<span className="text-3xl">{task.emoji || "⭐"}</span>
+															<div className="flex-1">
+																<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+																<div className="flex items-center gap-2 mt-1">
+																	<span className="text-orange-500 font-bold">⚡</span>
+																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+																</div>
+															</div>
+														</div>
+														<button
+															onClick={() => handleTaskComplete(task.id)}
+															disabled={task.completed}
+															className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
+																task.completed
+																	? "bg-green-200 text-green-700 cursor-default"
+																	: "bg-gray-200 text-gray-600 hover:bg-gray-300"
+															}`}>
+															{task.completed ? "✓" : "○"}
+														</button>
+													</div>
+												))}
 											</div>
 										</div>
-										<button
-											onClick={() => handleTaskComplete(task.id)}
-											disabled={task.completed}
-											className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
-												task.completed
-													? "bg-green-200 text-green-700 cursor-default"
-													: "bg-gray-200 text-gray-600 hover:bg-gray-300"
-											}`}>
-											{task.completed ? "✓" : "○"}
-										</button>
-									</div>
-								))
+									)}
+
+									{completedMorningTasks.length > 0 && (
+										<div className="pt-2 border-t border-emerald-200">
+											<h5 className="text-xs font-semibold text-emerald-700 px-2 py-1">✓ COMPLETED</h5>
+											<div className="space-y-2">
+												{completedMorningTasks.map((task) => (
+													<div
+														key={task.id}
+														className="bg-gradient-to-r from-emerald-100 to-green-100 rounded-2xl p-4 shadow-md border border-emerald-200 flex items-center justify-between opacity-80">
+														<div className="flex items-center gap-4 flex-1">
+															<span className="text-3xl opacity-60">{task.emoji || "⭐"}</span>
+															<div className="flex-1">
+																<h4 className="font-bold text-slate-700 line-through">{task.label || task.title}</h4>
+																<div className="flex items-center gap-2 mt-1">
+																	<span className="text-emerald-600 font-bold">⚡</span>
+																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+																</div>
+															</div>
+														</div>
+														<div className="p-3 rounded-full font-bold text-xl bg-emerald-200 text-emerald-700">✓</div>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</>
 							)}
 						</div>
 					)}
@@ -190,35 +250,70 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 
 					{expandedSection === "anytime" && (
 						<div className="space-y-3">
-							{anytimeTasks.length === 0 ? (
+							{/* Pending Anytime Tasks */}
+							{pendingAnytimeTasks.length === 0 && completedAnytimeTasks.length === 0 ? (
 								<p className="text-slate-600 text-center py-4">No anytime tasks yet. Add one to get started!</p>
 							) : (
-								anytimeTasks.map((task) => (
-									<div
-										key={task.id}
-										className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
-										<div className="flex items-center gap-4 flex-1">
-											<span className="text-3xl">{task.emoji || "⭐"}</span>
-											<div className="flex-1">
-												<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
-												<div className="flex items-center gap-2 mt-1">
-													<span className="text-orange-500 font-bold">⚡</span>
-													<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
-												</div>
+								<>
+									{pendingAnytimeTasks.length > 0 && (
+										<div>
+											<h5 className="text-xs font-semibold text-slate-600 px-2 py-1">TO DO</h5>
+											<div className="space-y-2">
+												{pendingAnytimeTasks.map((task) => (
+													<div
+														key={task.id}
+														className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
+														<div className="flex items-center gap-4 flex-1">
+															<span className="text-3xl">{task.emoji || "⭐"}</span>
+															<div className="flex-1">
+																<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+																<div className="flex items-center gap-2 mt-1">
+																	<span className="text-orange-500 font-bold">⚡</span>
+																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+																</div>
+															</div>
+														</div>
+														<button
+															onClick={() => handleTaskComplete(task.id)}
+															disabled={task.completed}
+															className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
+																task.completed
+																	? "bg-green-200 text-green-700 cursor-default"
+																	: "bg-gray-200 text-gray-600 hover:bg-gray-300"
+															}`}>
+															{task.completed ? "✓" : "○"}
+														</button>
+													</div>
+												))}
 											</div>
 										</div>
-										<button
-											onClick={() => handleTaskComplete(task.id)}
-											disabled={task.completed}
-											className={`p-3 rounded-full font-bold text-xl transition transform hover:scale-110 active:scale-95 ${
-												task.completed
-													? "bg-green-200 text-green-700 cursor-default"
-													: "bg-gray-200 text-gray-600 hover:bg-gray-300"
-											}`}>
-											{task.completed ? "✓" : "○"}
-										</button>
-									</div>
-								))
+									)}
+
+									{completedAnytimeTasks.length > 0 && (
+										<div className="pt-2 border-t border-emerald-200">
+											<h5 className="text-xs font-semibold text-emerald-700 px-2 py-1">✓ COMPLETED</h5>
+											<div className="space-y-2">
+												{completedAnytimeTasks.map((task) => (
+													<div
+														key={task.id}
+														className="bg-gradient-to-r from-emerald-100 to-green-100 rounded-2xl p-4 shadow-md border border-emerald-200 flex items-center justify-between opacity-80">
+														<div className="flex items-center gap-4 flex-1">
+															<span className="text-3xl opacity-60">{task.emoji || "⭐"}</span>
+															<div className="flex-1">
+																<h4 className="font-bold text-slate-700 line-through">{task.label || task.title}</h4>
+																<div className="flex items-center gap-2 mt-1">
+																	<span className="text-emerald-600 font-bold">⚡</span>
+																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
+																</div>
+															</div>
+														</div>
+														<div className="p-3 rounded-full font-bold text-xl bg-emerald-200 text-emerald-700">✓</div>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</>
 							)}
 						</div>
 					)}

@@ -88,6 +88,21 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 	const allAnytimeTasks = useMemo(() => getAllTasksForCategory("anytime"), [tasks]);
 	const allSpecialTasks = useMemo(() => getAllTasksForCategory("special"), [tasks]);
 
+	// Get completed tasks for today
+	const getCompletedTasksForToday = (category: "morning" | "anytime" | "special") => {
+		return tasks.filter((t) => {
+			if (t.category !== category) return false;
+			if (!t.completedDate) return false;
+			const completedDate = new Date(t.completedDate);
+			completedDate.setHours(0, 0, 0, 0);
+			return completedDate.getTime() === today.getTime();
+		});
+	};
+
+	const completedMorningTasks = useMemo(() => getCompletedTasksForToday("morning"), [tasks, today]);
+	const completedAnytimeTasks = useMemo(() => getCompletedTasksForToday("anytime"), [tasks, today]);
+	const completedSpecialTasks = useMemo(() => getCompletedTasksForToday("special"), [tasks, today]);
+
 	// Count today's completions for checkpoint
 	const getTodayCompletedCount = (category: "morning" | "anytime") => {
 		return tasks.filter((t) => {
@@ -232,9 +247,10 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 		icon: string;
 		categoryKey: "morning" | "anytime" | "special";
 		taskList: Task[];
+		completedTaskList?: Task[];
 		completedToday: number;
 		totalAvailable: number;
-	}> = ({ title, icon, categoryKey, taskList, completedToday, totalAvailable }) => (
+	}> = ({ title, icon, categoryKey, taskList, completedTaskList = [], completedToday, totalAvailable }) => (
 		<div className="mb-6 bg-white rounded-xl shadow-md overflow-hidden border-2 border-cyan-100">
 			<button
 				onClick={() =>
@@ -268,56 +284,98 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 
 			{expandedCategories[categoryKey] && (
 				<div className="px-4 sm:px-6 py-4 border-t border-cyan-100 space-y-3">
+					{/* To-Do Tasks */}
 					{taskList.length === 0 ? (
 						<p className="text-sm text-gray-500 italic">No tasks for today!</p>
 					) : (
-						taskList.map((task) => {
-							// Check if completed today
-							const completedToday = task.completedDate
-								? new Date(task.completedDate).toDateString() === new Date().toDateString()
-								: false;
+						<div>
+							<h4 className="text-xs font-semibold text-gray-600 mb-2">TO DO</h4>
+							<div className="space-y-2">
+								{taskList.map((task) => {
+									// Check if completed today
+									const completedToday = task.completedDate
+										? new Date(task.completedDate).toDateString() === new Date().toDateString()
+										: false;
 
-							// Show progression info
-							const progressText =
-								task.progressionValue && task.progressionValue > 0
-									? ` (${task.progressionValue}/${task.progressionValue * 2})`
-									: "";
+									// Show progression info
+									const progressText =
+										task.progressionValue && task.progressionValue > 0
+											? ` (${task.progressionValue}/${task.progressionValue * 2})`
+											: "";
 
-							return (
-								<button
-									key={task.id}
-									onClick={() => toggleTask(task.id)}
-									type="button"
-									className={`w-full flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform active:scale-95 ${
-										completedToday
-											? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400"
-											: "bg-white border-2 border-gray-300 hover:border-cyan-400 hover:bg-cyan-50 active:bg-cyan-100"
-									}`}>
-									<div
-										className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center font-bold text-sm"
-										style={{
-											borderColor: completedToday ? "#10b981" : "#a3e635",
-											backgroundColor: completedToday ? "#ecfdf5" : "transparent",
-											color: completedToday ? "#10b981" : "#a3e635",
-										}}>
-										{completedToday ? "✓" : ""}
-									</div>
-									<span
-										className={`text-sm sm:text-base flex-1 text-left ${completedToday ? "line-through text-gray-500" : "text-gray-800 font-medium"}`}>
-										{task.title}
-										{progressText && <span className="text-gray-400 text-xs ml-1">{progressText}</span>}
-									</span>
-									<div className="flex items-center gap-2 flex-shrink-0">
-										{task.reward && (
-											<span className={`font-bold text-sm ${completedToday ? "text-emerald-600" : "text-cyan-600"}`}>
-												+{task.reward}xp
+									return (
+										<button
+											key={task.id}
+											onClick={() => toggleTask(task.id)}
+											type="button"
+											className={`w-full flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform active:scale-95 ${
+												completedToday
+													? "bg-gradient-to-r from-emerald-100 to-cyan-100 border-2 border-emerald-400"
+													: "bg-white border-2 border-gray-300 hover:border-cyan-400 hover:bg-cyan-50 active:bg-cyan-100"
+											}`}>
+											<div
+												className="flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center font-bold text-sm"
+												style={{
+													borderColor: completedToday ? "#10b981" : "#a3e635",
+													backgroundColor: completedToday ? "#ecfdf5" : "transparent",
+													color: completedToday ? "#10b981" : "#a3e635",
+												}}>
+												{completedToday ? "✓" : ""}
+											</div>
+											<span
+												className={`text-sm sm:text-base flex-1 text-left ${completedToday ? "line-through text-gray-500" : "text-gray-800 font-medium"}`}>
+												{task.title}
+												{progressText && <span className="text-gray-400 text-xs ml-1">{progressText}</span>}
 											</span>
-										)}
-										{completedToday && <span className="text-emerald-600 text-xl animate-pulse">✓</span>}
-									</div>
-								</button>
-							);
-						})
+											<div className="flex items-center gap-2 flex-shrink-0">
+												{task.reward && (
+													<span
+														className={`font-bold text-sm ${completedToday ? "text-emerald-600" : "text-cyan-600"}`}>
+														+{task.reward}xp
+													</span>
+												)}
+												{completedToday && <span className="text-emerald-600 text-xl animate-pulse">✓</span>}
+											</div>
+										</button>
+									);
+								})}
+							</div>
+						</div>
+					)}
+
+					{/* Completed Tasks */}
+					{completedTaskList.length > 0 && (
+						<div className="pt-4 border-t border-emerald-200">
+							<h4 className="text-xs font-semibold text-emerald-700 mb-2">✓ COMPLETED</h4>
+							<div className="space-y-2">
+								{completedTaskList.map((task) => {
+									const progressText =
+										task.progressionValue && task.progressionValue > 0
+											? ` (${task.progressionValue}/${task.progressionValue * 2})`
+											: "";
+
+									return (
+										<button
+											key={task.id}
+											onClick={() => toggleTask(task.id)}
+											type="button"
+											className="w-full flex items-center gap-3 p-4 rounded-lg cursor-pointer transition transform active:scale-95 bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300 hover:shadow-md">
+											<div className="flex-shrink-0 w-6 h-6 rounded border-2 border-emerald-500 flex items-center justify-center font-bold text-sm text-emerald-600 bg-emerald-50">
+												✓
+											</div>
+											<span className="text-sm sm:text-base flex-1 text-left line-through text-gray-600">
+												{task.title}
+												{progressText && <span className="text-gray-400 text-xs ml-1">{progressText}</span>}
+											</span>
+											<div className="flex items-center gap-2 flex-shrink-0">
+												{task.reward && <span className="font-bold text-sm text-emerald-700">+{task.reward}xp</span>}
+												<span className="text-emerald-600 text-lg">✓</span>
+											</div>
+										</button>
+									);
+								})}
+							</div>
+						</div>
 					)}
 				</div>
 			)}
@@ -337,6 +395,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 				icon="☀️"
 				categoryKey="morning"
 				taskList={morningTasks}
+				completedTaskList={completedMorningTasks}
 				completedToday={getTodayCompletedCount("morning")}
 				totalAvailable={allMorningTasks.length}
 			/>
@@ -347,6 +406,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 				icon="⚡"
 				categoryKey="anytime"
 				taskList={anytimeTasks}
+				completedTaskList={completedAnytimeTasks}
 				completedToday={getTodayCompletedCount("anytime")}
 				totalAvailable={allAnytimeTasks.length}
 			/>
@@ -358,6 +418,7 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 					icon="🎯"
 					categoryKey="special"
 					taskList={specialTasks}
+					completedTaskList={completedSpecialTasks}
 					completedToday={0}
 					totalAvailable={allSpecialTasks.length}
 				/>
