@@ -302,19 +302,19 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 			<div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-green-400 via-green-300 to-green-200 border-t-4 border-green-500 shadow-2xl rounded-t-3xl">
 				<div className="flex justify-around items-center py-4 px-4 max-w-2xl mx-auto w-full">
 					{[
-						{ icon: "🏠", label: "Home", active: true },
-						{ icon: "📋", label: "Quests", active: false },
-						{ icon: "🏪", label: "Shop", active: false },
-						{ icon: "👥", label: "Friends", active: false },
-						{ icon: "🎒", label: "Bag", active: false },
-						{ icon: "🐻‍❄️", label: "Goose", active: false },
+						{ icon: "🏠", label: "Home", action: "home", active: true },
+						{ icon: "📋", label: "Quests", action: "companion", active: false },
+						{ icon: currentUser.companion?.name ? currentUser.companion.name.charAt(0) : "🐻‍❄️", 
+						  label: currentUser.companion?.name || "Companion", 
+						  action: "companion", 
+						  active: false },
 					].map((item) => (
 						<button
 							key={item.label}
 							className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition transform hover:scale-110 active:scale-95 ${
 								item.active ? "bg-white/40 text-white font-bold" : "text-white/60 hover:text-white/80"
 							}`}
-							onClick={() => onNavigate?.(item.label.toLowerCase())}>
+							onClick={() => onNavigate?.(item.action)}>
 							<span className="text-2xl">{item.icon}</span>
 							<span className="text-xs font-semibold">{item.label}</span>
 						</button>

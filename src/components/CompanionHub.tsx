@@ -11,7 +11,7 @@ export const CompanionHub: React.FC<{
 	onQuestNavigate?: (section: "meal" | "activity" | "journal" | "weight" | "goal") => void;
 }> = ({ onQuestNavigate }) => {
 	const { currentUser, updateUser } = useUsers();
-	const [view, setView] = useState<CompanionView>("bear");
+	const [view, setView] = useState<CompanionView>("quests");
 	const [showCheckIn, setShowCheckIn] = useState(false);
 	const [showNaming, setShowNaming] = useState(false);
 	const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
@@ -415,7 +415,7 @@ export const CompanionHub: React.FC<{
 							type="text"
 							value={petName}
 							onChange={(e) => setPetName(e.target.value)}
-						placeholder="e.g., Fluffy, Snowy, Bitey, Snowball, Frostbite, Aurora"
+							placeholder="e.g., Fluffy, Snowy, Bitey, Snowball, Frostbite, Aurora"
 							maxLength={20}
 							className="w-full px-4 py-3 border-2 border-cyan-400 rounded-xl focus:ring-4 focus:ring-cyan-300 focus:border-transparent mb-6 font-semibold text-lg"
 							onKeyDown={(e) => e.key === "Enter" && petName.trim() && handlePetNaming(petName)}
