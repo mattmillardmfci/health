@@ -106,6 +106,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 			setUsers((prev) => prev.filter((u) => u.id !== id));
 			if (currentUser?.id === id) {
 				setCurrentUser(null);
+				// Clear from localStorage
+				localStorage.removeItem("health-app-current-user");
 			}
 		},
 		[currentUser],

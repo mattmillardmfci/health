@@ -66,12 +66,18 @@ export const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
 	const handleDeleteAccount = () => {
 		deleteUser(currentUser.id);
 		setShowDeleteConfirm(false);
-		window.location.reload();
+		// Clear from localStorage and trigger navigation
+		localStorage.removeItem("health-app-current-user");
+		onLogout?.();
+		window.location.href = "/";
 	};
 
 	const handleLogout = () => {
 		setCurrentUser(null);
+		// Clear current user from localStorage
+		localStorage.removeItem("health-app-current-user");
 		onLogout?.();
+		window.location.href = "/";
 	};
 
 	const handleRecalculateBMR = () => {
