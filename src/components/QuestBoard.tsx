@@ -147,6 +147,24 @@ const generateQuests = (userId: string): Quest[] => {
 export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({ onNavigate }) => {
 	const { currentUser, updateUser } = useUsers();
 	const [quests, setQuests] = useState<Quest[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		if (!currentUser || !currentUser.companion) {
+			setIsLoading(false);
+			return;
+		}
+
+		// Use existing quests or generate new ones
+		if (currentUser.quests && currentUser.quests.length > 0) {
+			setQuests(currentUser.quests);
+		} else {
+			const newQuests = generateQuests(currentUser.id);
+			setQuests(newQuests);
+			updateUser({ ...currentUser, quests: newQuests });
+		}
+		setIsLoading(false);
+	}, [currentUser?.id, currentUser?.quests?.length]);
 
 	if (!currentUser || !currentUser.companion) {
 		return (
@@ -158,18 +176,18 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 		);
 	}
 
-	useEffect(() => {
-		if (!currentUser) return;
-
-		// Use existing quests or generate new ones
-		if (currentUser.quests && currentUser.quests.length > 0) {
-			setQuests(currentUser.quests);
-		} else {
-			const newQuests = generateQuests(currentUser.id);
-			setQuests(newQuests);
-			updateUser({ ...currentUser, quests: newQuests });
-		}
-	}, [currentUser?.id, currentUser?.quests?.length]);
+	if (isLoading) {
+		return (
+			<div className="w-full max-w-4xl mx-auto px-4 py-6">
+				<div className="bg-white rounded-2xl shadow-lg p-8 border border-purple-100 text-center">
+					<div className="animate-pulse space-y-4">
+						<div className="h-8 bg-gray-200 rounded w-1/3 mx-auto"></div>
+						<div className="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
 	const handleCompleteQuest = (questId: string) => {
 		const quest = quests.find((q) => q.id === questId);
