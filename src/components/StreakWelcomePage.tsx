@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUsers } from "../hooks/useUsers";
-import { BabyPolarBear } from "./BabyPolarBear";
+import { SnowballCub } from "./SnowballCub";
 
 interface StreakWelcomePageProps {
 	onContinue: () => void;
@@ -46,8 +46,8 @@ export const StreakWelcomePage: React.FC<StreakWelcomePageProps> = ({ onContinue
 
 			<div className="relative z-10 w-full max-w-md text-center">
 				{/* Companion */}
-				<div className="mb-12 animate-bounce flex justify-center">
-					<BabyPolarBear />
+				<div className="mb-12 flex justify-center">
+					<SnowballCub stage={currentUser?.companion?.stage ?? "cub"} />
 				</div>
 
 				{/* Streak Display */}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
-import { BabyPolarBear } from "./BabyPolarBear";
+import { SnowballCub } from "./SnowballCub";
 import type { Task } from "../types";
 
 interface GameDashboardProps {
@@ -17,49 +17,31 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 	const morningTasks = tasks.filter((t) => t.category === "morning");
 	const anytimeTasks = tasks.filter((t) => t.category !== "morning");
 
-	// Calculate completed today
-	const today = new Date().toISOString().split("T")[0];
-	const completedToday = tasks.filter((t) => {
+	const isTaskCompletedToday = (t: Task) => {
 		if (!t.completedDate) return false;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate === today;
-	});
+		return new Date(t.completedDate).toDateString() === new Date().toDateString();
+	};
+
+	// Calculate completed today
+	const completedToday = tasks.filter(isTaskCompletedToday);
 
 	// Separate tasks into pending and completed
-	const pendingMorningTasks = morningTasks.filter((t) => {
-		if (!t.completedDate) return true;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate !== today;
-	});
-
-	const completedMorningTasks = morningTasks.filter((t) => {
-		if (!t.completedDate) return false;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate === today;
-	});
-
-	const pendingAnytimeTasks = anytimeTasks.filter((t) => {
-		if (!t.completedDate) return true;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate !== today;
-	});
-
-	const completedAnytimeTasks = anytimeTasks.filter((t) => {
-		if (!t.completedDate) return false;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate === today;
-	});
+	const pendingMorningTasks = morningTasks.filter((t) => !isTaskCompletedToday(t));
+	const completedMorningTasks = morningTasks.filter((t) => isTaskCompletedToday(t));
+	const pendingAnytimeTasks = anytimeTasks.filter((t) => !isTaskCompletedToday(t));
+	const completedAnytimeTasks = anytimeTasks.filter((t) => isTaskCompletedToday(t));
 
 	const handleTaskComplete = (taskId: string) => {
 		const updatedTasks = currentUser.tasks.map((t) => {
-			if (t.id === taskId && !t.completed) {
-				return {
-					...t,
-					completed: true,
-					completedDate: new Date().toISOString(),
-				};
-			}
-			return t;
+			if (t.id !== taskId) return t;
+			if (isTaskCompletedToday(t)) return t;
+
+			const completedDate = new Date();
+			return {
+				...t,
+				completedDate,
+				completed: t.isRecurring ? t.completed : true,
+			};
 		});
 
 		const updatedCompanion = {
@@ -81,11 +63,7 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 			completedToday.filter((t) => t.category !== "morning").length,
 	);
 
-	const goalsForToday = tasks.filter((t) => {
-		if (!t.completedDate) return true;
-		const completedDate = new Date(t.completedDate).toISOString().split("T")[0];
-		return completedDate !== today;
-	}).length;
+	const goalsForToday = tasks.filter((t) => !isTaskCompletedToday(t)).length;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-cyan-200 via-cyan-100 to-blue-100 pb-32">
@@ -107,8 +85,8 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 				<div className="absolute bottom-0 left-1/4 transform translate-x-2 w-6 h-10 bg-blue-400 rounded opacity-60" />
 
 				{/* Companion */}
-				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 drop-shadow-lg animate-bounce">
-					<BabyPolarBear />
+				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 drop-shadow-lg">
+					<SnowballCub stage={currentUser.companion?.stage ?? "cub"} />
 				</div>
 
 				{/* Menu button */}
@@ -184,9 +162,9 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 														key={task.id}
 														className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
 														<div className="flex items-center gap-4 flex-1">
-															<span className="text-3xl">{task.emoji || "⭐"}</span>
+															<span className="text-3xl">⭐</span>
 															<div className="flex-1">
-																<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+																<h4 className="font-bold text-slate-800">{task.title}</h4>
 																<div className="flex items-center gap-2 mt-1">
 																	<span className="text-orange-500 font-bold">⚡</span>
 																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
@@ -218,9 +196,9 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 														key={task.id}
 														className="bg-gradient-to-r from-emerald-100 to-green-100 rounded-2xl p-4 shadow-md border border-emerald-200 flex items-center justify-between opacity-80">
 														<div className="flex items-center gap-4 flex-1">
-															<span className="text-3xl opacity-60">{task.emoji || "⭐"}</span>
+															<span className="text-3xl opacity-60">⭐</span>
 															<div className="flex-1">
-																<h4 className="font-bold text-slate-700 line-through">{task.label || task.title}</h4>
+																<h4 className="font-bold text-slate-700 line-through">{task.title}</h4>
 																<div className="flex items-center gap-2 mt-1">
 																	<span className="text-emerald-600 font-bold">⚡</span>
 																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
@@ -264,9 +242,9 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 														key={task.id}
 														className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-white/40 flex items-center justify-between hover:shadow-lg transition">
 														<div className="flex items-center gap-4 flex-1">
-															<span className="text-3xl">{task.emoji || "⭐"}</span>
+															<span className="text-3xl">⭐</span>
 															<div className="flex-1">
-																<h4 className="font-bold text-slate-800">{task.label || task.title}</h4>
+																<h4 className="font-bold text-slate-800">{task.title}</h4>
 																<div className="flex items-center gap-2 mt-1">
 																	<span className="text-orange-500 font-bold">⚡</span>
 																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
@@ -298,9 +276,9 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 														key={task.id}
 														className="bg-gradient-to-r from-emerald-100 to-green-100 rounded-2xl p-4 shadow-md border border-emerald-200 flex items-center justify-between opacity-80">
 														<div className="flex items-center gap-4 flex-1">
-															<span className="text-3xl opacity-60">{task.emoji || "⭐"}</span>
+															<span className="text-3xl opacity-60">⭐</span>
 															<div className="flex-1">
-																<h4 className="font-bold text-slate-700 line-through">{task.label || task.title}</h4>
+																<h4 className="font-bold text-slate-700 line-through">{task.title}</h4>
 																<div className="flex items-center gap-2 mt-1">
 																	<span className="text-emerald-600 font-bold">⚡</span>
 																	<span className="text-sm text-slate-600">{task.reward || 5} XP</span>
