@@ -246,6 +246,7 @@ export interface User {
 	overwhelmTriggers?: string[]; // "Financial concerns", "Making decisions", "Mental or physical health", "Lack of time for yourself", "Relationship issues", etc.
 
 	// Gamification
+	cubName?: string; // The name of the user's polar bear companion
 	companion?: CompanionStats;
 	quests?: Quest[];
 	tasks?: Task[];

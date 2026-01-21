@@ -13,12 +13,8 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNav
 	const [localUser, setLocalUser] = useState(currentUser);
 
 	// Categorize tasks
-	const morningRoutines =
-		localUser.tasks.filter((t) => !t.isRecurring || t.isRecurring) &&
-		localUser.tasks.filter((t) => t.category === "morning" || t.label?.includes("morning"));
-	const anytimeTasks = localUser.tasks.filter(
-		(t) => !t.isRecurring || (t.isRecurring && !t.label?.includes("morning")),
-	);
+	const morningRoutines = localUser.tasks.filter((t) => t.category === "morning");
+	const anytimeTasks = localUser.tasks.filter((t) => t.category !== "morning");
 
 	// Get today's date
 	const today = new Date().toISOString().split("T")[0];
@@ -31,31 +27,36 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNav
 
 	// Handle task completion with XP reward
 	const handleTaskComplete = (task: Task) => {
-		const updatedUser = { ...localUser };
-		const taskIndex = updatedUser.tasks.findIndex((t) => t.id === task.id);
+		try {
+			const updatedUser = { ...localUser };
+			const taskIndex = updatedUser.tasks.findIndex((t) => t.id === task.id);
 
-		if (taskIndex !== -1) {
-			const xpReward = (task.reward || 10) + 10; // Base 10 + task reward
+			if (taskIndex !== -1) {
+				const xpReward = (task.reward || 10) + 10; // Base 10 + task reward
 
-			// Update task
-			updatedUser.tasks[taskIndex] = {
-				...task,
-				completed: true,
-				completedDate: new Date(),
-			};
+				// Update task
+				updatedUser.tasks[taskIndex] = {
+					...task,
+					completed: true,
+					completedDate: new Date(),
+				};
 
-			// Award XP to companion
-			if (updatedUser.companion) {
-				const { companion: updatedCompanion, leveledUp } = awardXpToCompanion(updatedUser.companion, xpReward);
-				updatedUser.companion = updatedCompanion;
+				// Award XP to companion
+				if (updatedUser.companion) {
+					const { companion: updatedCompanion, leveledUp } = awardXpToCompanion(updatedUser.companion, xpReward);
+					updatedUser.companion = updatedCompanion;
+				}
+
+				// Check quests
+				const { updatedQuests } = checkTaskQuests(updatedUser, task.id, false);
+				updatedUser.quests = updatedQuests;
+
+				setLocalUser(updatedUser);
+				updateUser(updatedUser);
 			}
-
-			// Check quests
-			const { updatedQuests } = checkTaskQuests(updatedUser, task.id, false);
-			updatedUser.quests = updatedQuests;
-
-			setLocalUser(updatedUser);
-			updateUser(updatedUser);
+		} catch (error) {
+			console.error("Error completing task:", error);
+			alert("Error completing task. Please try again.");
 		}
 	};
 
@@ -164,18 +165,15 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNav
 						<span>🌅</span> Morning Routines
 					</h3>
 					<div className="space-y-3">
-						{anytimeTasks
-							.filter((t) => t.label?.includes("morning"))
-							.slice(0, 5)
-							.map((task) => (
-								<TaskCard
-									key={task.id}
-									task={task}
-									onComplete={() => handleTaskComplete(task)}
-									xpReward={(task.reward || 10) + 10}
-								/>
-							))}
-						{anytimeTasks.filter((t) => t.label?.includes("morning")).length === 0 && (
+						{morningRoutines.slice(0, 5).map((task) => (
+							<TaskCard
+								key={task.id}
+								task={task}
+								onComplete={() => handleTaskComplete(task)}
+								xpReward={(task.reward || 10) + 10}
+							/>
+						))}
+						{morningRoutines.length === 0 && (
 							<p className="text-slate-500 text-sm p-4 bg-slate-50 rounded-lg">No morning tasks yet</p>
 						)}
 					</div>
@@ -188,7 +186,7 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNav
 					</h3>
 					<div className="space-y-3">
 						{anytimeTasks
-							.filter((t) => !t.label?.includes("morning"))
+							.filter((t) => !t.title?.includes("morning"))
 							.slice(0, 5)
 							.map((task) => (
 								<TaskCard
@@ -198,12 +196,12 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ currentUser, onNav
 									xpReward={(task.reward || 10) + 10}
 								/>
 							))}
-						{anytimeTasks.filter((t) => !t.label?.includes("morning")).length === 0 && (
+						{anytimeTasks.filter((t) => !t.title?.includes("morning")).length === 0 && (
 							<p className="text-slate-500 text-sm p-4 bg-slate-50 rounded-lg">No quests yet</p>
 						)}
 					</div>
 					<button
-						onClick={() => onNavigate("goals")}
+						onClick={() => onNavigate("tasks")}
 						className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105">
 						📋 View All Tasks
 					</button>
@@ -266,7 +264,7 @@ function TaskCard({ task, onComplete, xpReward }: TaskCardProps) {
 				</button>
 				<div className="flex-1 min-w-0">
 					<p className={`font-semibold text-sm ${task.completed ? "line-through text-slate-500" : "text-slate-800"}`}>
-						{task.label}
+						{task.title}
 					</p>
 				</div>
 				<div className="text-right flex-shrink-0">
