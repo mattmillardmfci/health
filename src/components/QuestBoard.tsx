@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUsers } from "../hooks/useUsers";
 import type { Quest, CompanionStats } from "../types";
 
-type QuestNavigationCallback = (section: "meal" | "activity" | "journal" | "weight" | "goal") => void;
+type QuestNavigationCallback = (section: "meal" | "activity" | "journal" | "weight" | "goal" | "task") => void;
 
 const generateQuests = (userId: string): Quest[] => {
 	const today = new Date();
@@ -148,19 +148,28 @@ export const QuestBoard: React.FC<{ onNavigate?: QuestNavigationCallback }> = ({
 	const { currentUser, updateUser } = useUsers();
 	const [quests, setQuests] = useState<Quest[]>([]);
 
-	if (!currentUser || !currentUser.companion) return null;
+	if (!currentUser || !currentUser.companion) {
+		return (
+			<div className="w-full max-w-4xl mx-auto px-4 py-6">
+				<div className="bg-white rounded-2xl shadow-lg p-8 border border-purple-100 text-center">
+					<p className="text-gray-500 text-lg">No companion found. Please create one first.</p>
+				</div>
+			</div>
+		);
+	}
 
 	useEffect(() => {
-		// Generate quests if not exists
-		if (!currentUser.quests || currentUser.quests.length === 0) {
+		if (!currentUser) return;
+
+		// Use existing quests or generate new ones
+		if (currentUser.quests && currentUser.quests.length > 0) {
+			setQuests(currentUser.quests);
+		} else {
 			const newQuests = generateQuests(currentUser.id);
 			setQuests(newQuests);
-			// Save generated quests to user
 			updateUser({ ...currentUser, quests: newQuests });
-		} else {
-			setQuests(currentUser.quests);
 		}
-	}, [currentUser]);
+	}, [currentUser?.id, currentUser?.quests?.length]);
 
 	const handleCompleteQuest = (questId: string) => {
 		const quest = quests.find((q) => q.id === questId);
