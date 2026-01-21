@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
+import { BabyPolarBear } from "./BabyPolarBear";
 import type { Task } from "../types";
 
 interface GameDashboardProps {
@@ -81,8 +82,8 @@ export const GameDashboard: React.FC<GameDashboardProps> = ({ onNavigate }) => {
 				<div className="absolute bottom-0 left-1/4 transform translate-x-2 w-6 h-10 bg-blue-400 rounded opacity-60" />
 
 				{/* Companion */}
-				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-8xl drop-shadow-lg animate-bounce">
-					🐻‍❄️
+				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 drop-shadow-lg animate-bounce">
+					<BabyPolarBear />
 				</div>
 
 				{/* Menu button */}
