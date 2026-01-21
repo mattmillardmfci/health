@@ -15,6 +15,7 @@ import { Settings } from "./components/Settings";
 import { CloudSyncSettings } from "./components/CloudSyncSettings";
 import { CompanionHub } from "./components/CompanionHub";
 import { TaskList } from "./components/TaskList";
+import { GameDashboard } from "./components/GameDashboard";
 import { LoginScreen } from "./components/LoginScreen";
 import { SplashScreen } from "./components/SplashScreen";
 import { OnboardingWizard } from "./components/OnboardingWizard";
@@ -39,14 +40,28 @@ type ViewType =
 
 function AppContent() {
 	const { users, currentUser, setCurrentUser } = useUsers();
-	// Initialize view from localStorage or based on currentUser
-	const [view, setView] = useState<ViewType>(() => {
-		if (!currentUser) return "setup";
-		const savedView = localStorage.getItem("lastView") as ViewType | null;
-		return savedView && savedView !== "setup" ? savedView : "home";
-	});
+
+	// Check if user exists in localStorage on mount to prevent flash of splash screen
+	const [isHydrated, setIsHydrated] = useState(false);
+	const [view, setView] = useState<ViewType>("home");
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 	const [onboardingStage, setOnboardingStage] = useState<"splash" | "wizard" | "login">("splash");
+
+	// Initialize on mount after context is hydrated
+	React.useEffect(() => {
+		const savedUsers = localStorage.getItem("health-app-users");
+		const savedCurrent = localStorage.getItem("health-app-current-user");
+
+		if (savedUsers && savedCurrent) {
+			// User exists, skip onboarding
+			const savedView = localStorage.getItem("lastView") as ViewType | null;
+			setView(savedView && savedView !== "setup" ? savedView : "home");
+		} else {
+			// No user exists, show splash
+			setOnboardingStage("splash");
+		}
+		setIsHydrated(true);
+	}, []);
 
 	// Save view to localStorage when it changes
 	React.useEffect(() => {
@@ -60,8 +75,8 @@ function AppContent() {
 		window.scrollTo(0, 0);
 	}, [view]);
 
-	// Show onboarding if no user
-	if (!currentUser) {
+	// Show onboarding if no user and we've checked localStorage
+	if (!currentUser && isHydrated) {
 		if (onboardingStage === "splash") {
 			return (
 				<SplashScreen onCreateCub={() => setOnboardingStage("wizard")} onLogin={() => setOnboardingStage("login")} />
@@ -82,6 +97,18 @@ function AppContent() {
 					setView("home");
 				}}
 			/>
+		);
+	}
+
+	// Loading state while context hydrates
+	if (!isHydrated || !currentUser) {
+		return (
+			<div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center">
+				<div className="text-center">
+					<div className="text-6xl mb-4">🐻‍❄️</div>
+					<p className="text-slate-600 animate-pulse">Loading your polar bear...</p>
+				</div>
+			</div>
 		);
 	}
 
@@ -240,7 +267,7 @@ function AppContent() {
 						</div>
 					</div>
 				) : view === "home" ? (
-					<TaskList />
+					<GameDashboard currentUser={currentUser} onNavigate={(newView) => setView(newView)} />
 				) : view === "results" ? (
 					<NutritionResults user={currentUser} />
 				) : view === "companion" ? (
