@@ -5,11 +5,12 @@ import { generateStarterTasks } from "../utils/starterTasksGenerator";
 
 interface OnboardingWizardProps {
 	onCompleted: () => void;
+	onBack?: () => void;
 }
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
-export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted }) => {
+export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted, onBack }) => {
 	const { addUser } = useUsers();
 	const [step, setStep] = useState<Step>(0);
 
@@ -116,6 +117,15 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted 
 		<div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex items-center justify-center p-4">
 			<div className="w-full max-w-lg bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200">
 				<div className="p-6">
+					{/* Back Button */}
+					{onBack && (
+						<button
+							onClick={onBack}
+							className="mb-4 flex items-center gap-1 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">
+							<span className="text-lg">←</span> Back
+						</button>
+					)}
+
 					{/* Progress */}
 					<div className="flex items-center gap-2 mb-6">
 						{[0, 1, 2, 3, 4, 5].map((idx) => (

@@ -91,6 +91,7 @@ function AppContent() {
 					onCompleted={() => {
 						setShowStreakWelcome(true);
 					}}
+					onBack={() => setOnboardingStage("splash")}
 				/>
 			);
 		}
