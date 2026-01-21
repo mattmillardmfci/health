@@ -2,96 +2,12 @@ import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useUsers } from "../hooks/useUsers";
 import { onAuthChange, loginUser, registerUser, signInWithGoogle } from "../utils/firebase";
+import { SnowballCub } from "./SnowballCub";
+import type { CompanionStats } from "../types";
 
 interface LoginScreenProps {
 	onLoginSuccess: () => void;
 }
-
-// Animated cartoon polar bear face (shared component)
-const PolarBearFace: React.FC<{ className?: string }> = ({ className }) => (
-	<svg className={className} viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-		<defs>
-			<style>{`
-				@keyframes bounce {
-					0%, 100% { transform: translateY(0px); }
-					50% { transform: translateY(-15px); }
-				}
-				@keyframes blink {
-					0%, 49%, 100% { cy: 110; ry: 18; }
-					50%, 98% { cy: 115; ry: 5; }
-				}
-				@keyframes wag {
-					0%, 100% { transform: rotate(-15deg); }
-					50% { transform: rotate(15deg); }
-				}
-				.bear-body {
-					animation: bounce 2s ease-in-out infinite;
-				}
-				.bear-eye-left {
-					animation: blink 3s ease-in-out infinite;
-				}
-				.bear-eye-right {
-					animation: blink 3s ease-in-out infinite 0.1s;
-				}
-				.bear-ear-left {
-					animation: wag 1.5s ease-in-out infinite;
-					transform-origin: 65px 30px;
-				}
-				.bear-ear-right {
-					animation: wag 1.5s ease-in-out infinite;
-					transform-origin: 175px 30px;
-				}
-			`}</style>
-		</defs>
-
-		{/* Body -->*/}
-		<g className="bear-body">
-			{/* Main head circle */}
-			<circle cx="120" cy="140" r="85" fill="#e8f0f7" stroke="#a0adc4" strokeWidth="3" />
-
-			{/* Ears */}
-			<circle cx="65" cy="60" r="28" fill="#d4dce8" stroke="#8b93a8" strokeWidth="2" className="bear-ear-left" />
-			<circle cx="175" cy="60" r="28" fill="#d4dce8" stroke="#8b93a8" strokeWidth="2" className="bear-ear-right" />
-
-			{/* Inner ears */}
-			<circle cx="65" cy="65" r="16" fill="#c0c8d8" className="bear-ear-left" />
-			<circle cx="175" cy="65" r="16" fill="#c0c8d8" className="bear-ear-right" />
-
-			{/* Snout/muzzle */}
-			<ellipse cx="120" cy="165" rx="45" ry="50" fill="#f0f5fa" stroke="#a0adc4" strokeWidth="2" />
-
-			{/* Eyes */}
-			<circle cx="95" cy="110" r="16" fill="#1a1a2e" />
-			<circle cx="145" cy="110" r="16" fill="#1a1a2e" />
-
-			{/* Eye shine/sparkle */}
-			<circle cx="98" cy="107" r="6" fill="#ffffff" opacity="0.8" />
-			<circle cx="148" cy="107" r="6" fill="#ffffff" opacity="0.8" />
-
-			{/* Nose */}
-			<ellipse cx="120" cy="145" rx="12" ry="15" fill="#1a1a2e" />
-
-			{/* Smile/mouth */}
-			<path d="M 120 155 Q 115 165 110 163" stroke="#1a1a2e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-			<path d="M 120 155 Q 125 165 130 163" stroke="#1a1a2e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-			{/* Cheeks - pink blush */}
-			<ellipse cx="65" cy="140" rx="18" ry="22" fill="#ffc0cb" opacity="0.4" />
-			<ellipse cx="175" cy="140" rx="18" ry="22" fill="#ffc0cb" opacity="0.4" />
-
-			{/* Front paws */}
-			<ellipse cx="85" cy="220" rx="20" ry="28" fill="#d4dce8" stroke="#8b93a8" strokeWidth="2" />
-			<ellipse cx="155" cy="220" rx="20" ry="28" fill="#d4dce8" stroke="#8b93a8" strokeWidth="2" />
-
-			{/* Paw pads */}
-			<circle cx="85" cy="245" r="8" fill="#1a1a2e" />
-			<circle cx="155" cy="245" r="8" fill="#1a1a2e" />
-
-			{/* Belly spot */}
-			<ellipse cx="120" cy="180" rx="35" ry="40" fill="#ffffff" opacity="0.6" />
-		</g>
-	</svg>
-);
 
 export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 	const { addUser } = useUsers();
@@ -101,6 +17,28 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 	const [name, setName] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
+
+	const createDefaultCompanion = (userId: string, companionName = "Frost"): CompanionStats => ({
+		id: `companion-${userId}`,
+		userId,
+		name: companionName,
+		level: 1,
+		experience: 0,
+		stage: "cub",
+		happiness: 70,
+		hunger: 30,
+		energy: 80,
+		health: 90,
+		cleanliness: 75,
+		lastFed: new Date(),
+		lastCaredFor: new Date(),
+		adventureProgress: 0,
+		currentAdventure: "Awakening",
+		totalPoints: 0,
+		streakDays: 1,
+		unlockedAchievements: [],
+		createdAt: new Date(),
+	});
 
 	const handleLocalLogin = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -112,17 +50,20 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 		}
 
 		try {
+			const userId = Date.now().toString();
 			// Create local user
 			addUser({
-				id: Date.now().toString(),
+				id: userId,
 				name: name.trim(),
 				gender: "male",
 				weight: 180,
 				height: 70,
 				age: 30,
-				activityLevel: "lightly-active",
+				activityLevel: "lightly_active",
 				goal: "lose_weight",
 				weeklyWeightLossTarget: 1,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 				dietaryRestrictions: [],
 				medicalConditions: [],
 				mentalHealthChallenges: [],
@@ -130,13 +71,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 				overwhelmTriggers: [],
 				mealTypes: ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"],
 				tasks: [],
-				companion: {
-					name: "Polar Bear",
-					level: 1,
-					experience: 0,
-					stage: "cub",
-					happiness: 80,
-				},
+				companion: createDefaultCompanion(userId),
 				quests: [],
 				mealLogs: [],
 				activityLogs: [],
@@ -205,17 +140,20 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
 		try {
 			await registerUser(email, password);
+			const userId = email;
 			// Create a default user profile
 			addUser({
-				id: email,
+				id: userId,
 				name: email.split("@")[0],
 				gender: "male",
 				weight: 180,
 				height: 70,
 				age: 30,
-				activityLevel: "lightly-active",
+				activityLevel: "lightly_active",
 				goal: "lose_weight",
 				weeklyWeightLossTarget: 1,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 				dietaryRestrictions: [],
 				medicalConditions: [],
 				mentalHealthChallenges: [],
@@ -223,13 +161,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 				overwhelmTriggers: [],
 				mealTypes: ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"],
 				tasks: [],
-				companion: {
-					name: "Polar Bear",
-					level: 1,
-					experience: 0,
-					stage: "cub",
-					happiness: 80,
-				},
+				companion: createDefaultCompanion(userId),
 				quests: [],
 				mealLogs: [],
 				activityLogs: [],
@@ -254,11 +186,12 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 		try {
 			const result = await signInWithGoogle(credentialResponse.credential);
 			const user = result.user;
+			const userId = user.uid;
 
 			// Create or update user profile
 			const nameFromEmail = user.email?.split("@")[0] || "User";
 			addUser({
-				id: user.uid,
+				id: userId,
 				name: user.displayName || nameFromEmail,
 				email: user.email || "",
 				photoURL: user.photoURL || "",
@@ -266,9 +199,11 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 				weight: 180,
 				height: 70,
 				age: 30,
-				activityLevel: "lightly-active",
+				activityLevel: "lightly_active",
 				goal: "lose_weight",
 				weeklyWeightLossTarget: 1,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 				dietaryRestrictions: [],
 				medicalConditions: [],
 				mentalHealthChallenges: [],
@@ -276,13 +211,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 				overwhelmTriggers: [],
 				mealTypes: ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"],
 				tasks: [],
-				companion: {
-					name: "Polar Bear",
-					level: 1,
-					experience: 0,
-					stage: "cub",
-					happiness: 80,
-				},
+				companion: createDefaultCompanion(userId),
 				quests: [],
 				mealLogs: [],
 				activityLogs: [],
@@ -307,7 +236,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 			<div className="max-w-md w-full">
 				{/* Header */}
 				<div className="text-center mb-8">
-					<PolarBearFace className="w-40 h-48 mx-auto drop-shadow-xl mb-4" />
+					<SnowballCub stage="cub" className="w-40 h-48 mx-auto drop-shadow-xl mb-4" />
 					<h1 className="text-3xl font-bold text-gray-800 mb-2">Snowball</h1>
 					<p className="text-gray-600">Your personal self-care companion</p>
 				</div>
