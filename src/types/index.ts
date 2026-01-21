@@ -206,6 +206,8 @@ export interface SpecialQuest {
 export interface User {
 	id: string;
 	name: string;
+	email?: string;
+	photoURL?: string;
 	gender: Gender;
 	age: number;
 	weight: number; // in lbs
@@ -248,6 +250,9 @@ export interface User {
 	quests?: Quest[];
 	tasks?: Task[];
 	specialQuests?: SpecialQuest[];
+
+	// Meal customization
+	mealTypes?: string[]; // Custom meal names like ["Meal 1", "Meal 2", "Snacks", "Supplements"]
 	dailyCheckIns?: DailyCheckIn[];
 
 	// UI/App preferences

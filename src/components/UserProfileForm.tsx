@@ -114,6 +114,7 @@ export const UserProfileForm: React.FC<UserProfileFormProps> = ({ onProfileCreat
 			mentalHealthChallenges: formData.mentalHealthChallenges || [],
 			supportAreas: formData.supportAreas || [],
 			overwhelmTriggers: formData.overwhelmTriggers || [],
+			mealTypes: formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"],
 			tasks: [...(currentUser?.tasks || []), ...starterTasks],
 			createdAt: currentUser?.createdAt || new Date(),
 			updatedAt: new Date(),
@@ -359,6 +360,63 @@ export const UserProfileForm: React.FC<UserProfileFormProps> = ({ onProfileCreat
 									{option}
 								</button>
 							))}
+						</div>
+					</div>
+
+					{/* MEAL TYPES CUSTOMIZATION SECTION */}
+					<div className="border-t pt-8">
+						<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+							<span className="text-xl">🍽️</span> Meal Types
+						</h3>
+						<p className="text-gray-600 text-sm mb-4">
+							Customize your meal types (e.g., "Meal 1", "Meal 2", "Snacks", etc.):
+						</p>
+						<div className="space-y-3">
+							{(formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]).map(
+								(type, idx) => (
+									<div key={idx} className="flex gap-2">
+										<input
+											type="text"
+											value={type}
+											onChange={(e) => {
+												const newTypes = [
+													...(formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]),
+												];
+												newTypes[idx] = e.target.value;
+												setFormData({ ...formData, mealTypes: newTypes });
+											}}
+											placeholder={`Meal type ${idx + 1}`}
+											className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+										{(formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]).length >
+											2 && (
+											<button
+												type="button"
+												onClick={() => {
+													const newTypes = (
+														formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]
+													).filter((_, i) => i !== idx);
+													setFormData({ ...formData, mealTypes: newTypes });
+												}}
+												className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 font-semibold text-sm">
+												Remove
+											</button>
+										)}
+									</div>
+								),
+							)}
+							<button
+								type="button"
+								onClick={() => {
+									const newTypes = [
+										...(formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]),
+										`Meal ${(formData.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"]).length + 1}`,
+									];
+									setFormData({ ...formData, mealTypes: newTypes });
+								}}
+								className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 font-semibold text-sm">
+								+ Add Meal Type
+							</button>
 						</div>
 					</div>
 

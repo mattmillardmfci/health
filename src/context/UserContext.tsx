@@ -1,6 +1,7 @@
 import React, { createContext, useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import type { User } from "../types";
+import { initializeFirebase, saveUserToDatabase, subscribeToUserUpdates } from "../utils/firebase";
 
 interface UserContextType {
 	users: User[];
@@ -9,6 +10,7 @@ interface UserContextType {
 	updateUser: (user: User) => void;
 	deleteUser: (id: string) => void;
 	setCurrentUser: (user: User | null) => void;
+	isCloudSyncEnabled: boolean;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -16,6 +18,13 @@ export const UserContext = createContext<UserContextType | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [users, setUsers] = useState<User[]>([]);
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
+	const [isCloudSyncEnabled, setIsCloudSyncEnabled] = useState(false);
+
+	// Initialize Firebase on mount
+	React.useEffect(() => {
+		const { database } = initializeFirebase();
+		setIsCloudSyncEnabled(!!database);
+	}, []);
 
 	// Load users from localStorage on mount
 	React.useEffect(() => {
@@ -53,9 +62,28 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 		}
 	}, [currentUser]);
 
-	const addUser = useCallback((user: User) => {
-		setUsers((prev) => [...prev, user]);
-	}, []);
+	// Save to cloud database when user is updated (if enabled)
+	React.useEffect(() => {
+		if (currentUser && isCloudSyncEnabled) {
+			saveUserToDatabase(currentUser.id, currentUser).catch((error) => {
+				console.error("Failed to sync user to cloud:", error);
+			});
+		}
+	}, [currentUser, isCloudSyncEnabled]);
+
+	const addUser = useCallback(
+		(user: User) => {
+			setUsers((prev) => [...prev, user]);
+			setCurrentUser(user);
+			// Sync to cloud if enabled
+			if (isCloudSyncEnabled) {
+				saveUserToDatabase(user.id, user).catch((error) => {
+					console.error("Failed to sync new user to cloud:", error);
+				});
+			}
+		},
+		[isCloudSyncEnabled],
+	);
 
 	const updateUser = useCallback(
 		(user: User) => {
@@ -63,8 +91,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 			if (currentUser?.id === user.id) {
 				setCurrentUser(user);
 			}
+			// Sync to cloud if enabled
+			if (isCloudSyncEnabled) {
+				saveUserToDatabase(user.id, user).catch((error) => {
+					console.error("Failed to sync user to cloud:", error);
+				});
+			}
 		},
-		[currentUser],
+		[currentUser, isCloudSyncEnabled],
 	);
 
 	const deleteUser = useCallback(
@@ -86,6 +120,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 				updateUser,
 				deleteUser,
 				setCurrentUser,
+				isCloudSyncEnabled,
 			}}>
 			{children}
 		</UserContext.Provider>

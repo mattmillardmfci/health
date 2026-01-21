@@ -92,6 +92,50 @@ export const generateStarterTasks = (config: StarterTasksConfig): Task[] => {
 		},
 	];
 
+	// ORGANIZATION SUPPORT AREA
+	if (config.supportAreas.includes("Get more organized")) {
+		anytimeTasks.push({
+			userId: "",
+			title: "Pick up 10 items and put them away",
+			description: "Tidy up by returning things to their places",
+			category: "anytime",
+			isRecurring: false,
+			progressionValue: 10,
+			completed: false,
+			reward: 20,
+		});
+		anytimeTasks.push({
+			userId: "",
+			title: "Bring all dishes to the sink",
+			description: "Collect dishes from rooms and stages",
+			category: "anytime",
+			isRecurring: false,
+			progressionValue: 0,
+			completed: false,
+			reward: 15,
+		});
+		anytimeTasks.push({
+			userId: "",
+			title: "Load items into the dishwasher",
+			description: "Put sink items into the dishwasher",
+			category: "anytime",
+			isRecurring: false,
+			progressionValue: 0,
+			completed: false,
+			reward: 15,
+		});
+		anytimeTasks.push({
+			userId: "",
+			title: "Carry one item back to its place",
+			description: "Find one item that doesn't belong and return it",
+			category: "anytime",
+			isRecurring: false,
+			progressionValue: 1,
+			completed: false,
+			reward: 10,
+		});
+	}
+
 	// SUPPORT AREA SPECIFIC TASKS
 	if (config.supportAreas.includes("Be more active")) {
 		anytimeTasks.push({

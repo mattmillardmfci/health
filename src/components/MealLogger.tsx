@@ -2,16 +2,24 @@ import React, { useState, useMemo } from "react";
 import type { MealLog } from "../types";
 import { useUsers } from "../hooks/useUsers";
 import { searchFoods, getFoodsByCategory, getCategories, type FoodItem } from "../data/foods";
+import { searchUSDAFoods, getUSDAFoodDetails } from "../utils/usdaFoodApi";
 
 export const MealLogger: React.FC = () => {
 	const { currentUser, updateUser } = useUsers();
 	const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
-	const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">("breakfast");
+
+	// Get default meal types from user or use defaults
+	const defaultMealTypes = currentUser?.mealTypes || ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Snacks", "Supplements"];
+	const [mealType, setMealType] = useState<string>(defaultMealTypes[0]);
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
 	const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
 	const [servingMultiplier, setServingMultiplier] = useState(1);
 	const [showManualEntry, setShowManualEntry] = useState(false);
+	const [usedaResults, setUSDAResults] = useState<any[]>([]);
+	const [usdaLoading, setUSDALoading] = useState(false);
+	const [showUSDAResults, setShowUSDAResults] = useState(false);
 	const [manualEntry, setManualEntry] = useState({
 		name: "",
 		calories: 0,
@@ -35,7 +43,7 @@ export const MealLogger: React.FC = () => {
 		{ protein: 0, carbs: 0, fat: 0, calories: 0 },
 	);
 
-	// Get filtered foods
+	// Get filtered foods from local database
 	const filteredFoods = useMemo(() => {
 		if (searchQuery.trim()) {
 			return searchFoods(searchQuery);
@@ -46,7 +54,58 @@ export const MealLogger: React.FC = () => {
 		return [];
 	}, [searchQuery, selectedCategory]);
 
+	// Search USDA database when user types
+	React.useEffect(() => {
+		if (searchQuery.trim().length > 2) {
+			const searchUSDA = async () => {
+				setUSDALoading(true);
+				try {
+					const results = await searchUSDAFoods(searchQuery);
+					setUSDAResults(results);
+					if (results.length > 0) {
+						setShowUSDAResults(true);
+					}
+				} catch (err) {
+					console.warn("USDA search failed", err);
+				} finally {
+					setUSDALoading(false);
+				}
+			};
+			const timer = setTimeout(searchUSDA, 500); // Debounce
+			return () => clearTimeout(timer);
+		} else {
+			setUSDAResults([]);
+			setShowUSDAResults(false);
+		}
+	}, [searchQuery]);
+
 	const categories = getCategories();
+
+	// Handle selecting a USDA food item
+	const handleSelectUSDAFood = async (fdcId: string) => {
+		setUSDALoading(true);
+		try {
+			const details = await getUSDAFoodDetails(fdcId, 100);
+			if (details) {
+				setSelectedFood({
+					id: fdcId,
+					name: details.name,
+					category: "processed",
+					serving: details.serving,
+					servingGrams: details.servingGrams,
+					calories: details.calories,
+					protein: details.protein,
+					carbs: details.carbs,
+					fat: details.fat,
+				});
+				setShowUSDAResults(false);
+			}
+		} catch (err) {
+			console.warn("Failed to load USDA food details", err);
+		} finally {
+			setUSDALoading(false);
+		}
+	};
 
 	const handleAddMeal = () => {
 		if (!selectedFood) return;
@@ -269,12 +328,13 @@ export const MealLogger: React.FC = () => {
 								<label className="block text-sm font-semibold text-gray-700 mb-2">Meal Type</label>
 								<select
 									value={mealType}
-									onChange={(e) => setMealType(e.target.value as any)}
+									onChange={(e) => setMealType(e.target.value)}
 									className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-									<option value="breakfast">Breakfast</option>
-									<option value="lunch">Lunch</option>
-									<option value="dinner">Dinner</option>
-									<option value="snack">Snack</option>
+									{defaultMealTypes.map((type) => (
+										<option key={type} value={type}>
+											{type}
+										</option>
+									))}
 								</select>
 							</div>
 
@@ -327,6 +387,9 @@ export const MealLogger: React.FC = () => {
 							{/* Food List */}
 							{filteredFoods.length > 0 && !selectedFood && (
 								<div className="max-h-64 overflow-y-auto border-2 border-gray-300 rounded-lg bg-white">
+									<div className="sticky top-0 bg-gray-100 px-4 py-2 border-b border-gray-300 text-sm font-semibold text-gray-700">
+										📚 Local Database
+									</div>
 									{filteredFoods.map((food) => (
 										<button
 											key={food.id}
@@ -343,6 +406,33 @@ export const MealLogger: React.FC = () => {
 										</button>
 									))}
 								</div>
+							)}
+
+							{/* USDA Results */}
+							{showUSDAResults && usedaResults.length > 0 && !selectedFood && (
+								<div className="max-h-64 overflow-y-auto border-2 border-emerald-300 rounded-lg bg-emerald-50">
+									<div className="sticky top-0 bg-emerald-100 px-4 py-2 border-b border-emerald-300 text-sm font-semibold text-emerald-700">
+										🔍 USDA Database Results {usdaLoading && <span className="ml-2 text-xs">(loading...)</span>}
+									</div>
+									{usedaResults.map((food) => (
+										<button
+											key={food.fdcId}
+											onClick={() => handleSelectUSDAFood(food.fdcId)}
+											disabled={usdaLoading}
+											className="w-full text-left px-4 py-3 hover:bg-emerald-100 border-b border-emerald-100 transition disabled:opacity-50">
+											<div className="flex justify-between items-start">
+												<div>
+													<p className="font-semibold text-gray-800 text-sm">{food.description}</p>
+													<p className="text-xs text-gray-500">Type: {food.dataType}</p>
+												</div>
+											</div>
+										</button>
+									))}
+								</div>
+							)}
+
+							{usdaLoading && (
+								<div className="text-center py-4 text-sm text-gray-600">🔍 Searching USDA database...</div>
 							)}
 
 							{/* Selected Food */}

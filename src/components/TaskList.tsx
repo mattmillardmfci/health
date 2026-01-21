@@ -326,16 +326,10 @@ export const TaskList: React.FC<TaskListProps> = ({ onTaskComplete, onQuestCompl
 
 	return (
 		<div className="w-full max-w-3xl mx-auto">
-			{/* Today's Checkpoint Header */}
-			<div className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 rounded-2xl p-6 sm:p-8 mb-8 text-white shadow-lg">
-				<h1 className="text-2xl sm:text-3xl font-bold mb-2">
-					📍 Today's Checkpoint -{" "}
-					{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
-				</h1>
-				<p className="text-orange-100">
-					{currentUser.companion?.name || "Your polar bear"} is watching! Complete tasks to earn XP.
-				</p>
-			</div>
+			{/* Date Header */}
+			<h2 className="text-xl font-semibold text-gray-700 mb-6 mt-4">
+				{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+			</h2>
 
 			{/* Morning Tasks */}
 			<TaskCategory

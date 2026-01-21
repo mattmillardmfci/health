@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { UserProvider } from "./context/UserContext";
 import { UserProfileForm } from "./components/UserProfileForm";
 import { NutritionResults } from "./components/NutritionResults";
@@ -11,8 +12,12 @@ import { SupplementStackBuilder } from "./components/SupplementStackBuilder";
 import { JournalComponent } from "./components/JournalComponent";
 import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import { Settings } from "./components/Settings";
+import { CloudSyncSettings } from "./components/CloudSyncSettings";
 import { CompanionHub } from "./components/CompanionHub";
 import { TaskList } from "./components/TaskList";
+import { LoginScreen } from "./components/LoginScreen";
+import { SplashScreen } from "./components/SplashScreen";
+import { OnboardingWizard } from "./components/OnboardingWizard";
 import { useUsers } from "./hooks/useUsers";
 import "./App.css";
 
@@ -29,7 +34,8 @@ type ViewType =
 	| "supplements"
 	| "analytics"
 	| "companion"
-	| "settings";
+	| "settings"
+	| "cloud-sync";
 
 function AppContent() {
 	const { users, currentUser, setCurrentUser } = useUsers();
@@ -40,6 +46,7 @@ function AppContent() {
 		return savedView && savedView !== "setup" ? savedView : "home";
 	});
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
+	const [onboardingStage, setOnboardingStage] = useState<"splash" | "wizard" | "login">("splash");
 
 	// Save view to localStorage when it changes
 	React.useEffect(() => {
@@ -53,62 +60,74 @@ function AppContent() {
 		window.scrollTo(0, 0);
 	}, [view]);
 
+	// Show onboarding if no user
+	if (!currentUser) {
+		if (onboardingStage === "splash") {
+			return (
+				<SplashScreen onCreateCub={() => setOnboardingStage("wizard")} onLogin={() => setOnboardingStage("login")} />
+			);
+		}
+		if (onboardingStage === "wizard") {
+			return (
+				<OnboardingWizard
+					onCompleted={() => {
+						setView("home");
+					}}
+				/>
+			);
+		}
+		return (
+			<LoginScreen
+				onLoginSuccess={() => {
+					setView("home");
+				}}
+			/>
+		);
+	}
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-			{/* Header - Only show when no user is logged in */}
-			{!currentUser && (
-				<header className="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 w-full">
-						<div className="flex items-center justify-center">
-							<div className="text-center">
-								<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-									❄️ Snowball
-								</h1>
-								<p className="text-gray-500 text-xs sm:text-sm mt-1">Raise your polar bear while mastering nutrition</p>
-							</div>
-						</div>
-					</div>
-				</header>
-			)}
-
-			{/* Top Navigation Bar - Desktop only, when user is logged in */}
-			{currentUser && (
-				<nav className="hidden lg:flex sticky top-0 z-40 bg-white border-b border-blue-100 shadow-sm">
-					<div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-2 flex items-center gap-1">
-						{[
-							{ view: "home", label: "🏠 Home" },
-							{ view: "companion", label: "🐻‍❄️ Companion" },
-							{ view: "results", label: "💪 Nutrition" },
-							{ view: "progress", label: "📈 Progress" },
-							{ view: "goals", label: "🎯 Goals" },
-							{ view: "meals", label: "🍽️ Meals" },
-							{ view: "activity", label: "🏃 Activity" },
-							{ view: "journal", label: "📔 Journal" },
-							{ view: "supplements", label: "💊 Supplements" },
-							{ view: "analytics", label: "📊 Analytics" },
-							{ view: "recipes", label: "👨‍🍳 Recipes" },
-						].map((item) => (
-							<button
-								key={item.view}
-								onClick={() => setView(item.view as ViewType)}
-								className={`px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 ${view === item.view ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
-								{item.label}
-							</button>
-						))}
-						<div className="flex-1" />
+			{/* Top Navigation Bar - Desktop only */}
+			<nav className="hidden lg:flex sticky top-0 z-40 bg-white border-b border-blue-100 shadow-sm">
+				<div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-2 flex items-center gap-1">
+					{[
+						{ view: "home", label: "🏠 Home" },
+						{ view: "companion", label: "🐻‍❄️ Companion" },
+						{ view: "results", label: "💪 Nutrition" },
+						{ view: "progress", label: "📈 Progress" },
+						{ view: "goals", label: "🎯 Goals" },
+						{ view: "meals", label: "🍽️ Meals" },
+						{ view: "activity", label: "🏃 Activity" },
+						{ view: "journal", label: "📔 Journal" },
+						{ view: "supplements", label: "💊 Supplements" },
+						{ view: "analytics", label: "📊 Analytics" },
+						{ view: "recipes", label: "👨‍🍳 Recipes" },
+					].map((item) => (
 						<button
-							onClick={() => setView("setup")}
-							className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
-							✏️ Edit
+							key={item.view}
+							onClick={() => setView(item.view as ViewType)}
+							className={`px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 ${view === item.view ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
+							{item.label}
 						</button>
-						<button
-							onClick={() => setView("settings")}
-							className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
-							⚙️ Settings
-						</button>
-					</div>
-				</nav>
-			)}
+					))}
+					<div className="flex-1" />
+					<button
+						onClick={() => setView("setup")}
+						className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
+						✏️ Edit
+					</button>
+					<button
+						onClick={() => setView("cloud-sync")}
+						className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
+						☁️ Cloud
+					</button>
+					<button
+						onClick={() => setView("settings")}
+						className="px-3 py-2 text-xs font-semibold rounded-lg transition duration-200 text-gray-700 hover:bg-gray-100">
+						⚙️ Settings
+					</button>
+				</div>
+			</nav>
 
 			{/* Floating Mobile Menu - Only show when user is logged in */}
 			{currentUser && (
@@ -165,6 +184,14 @@ function AppContent() {
 								className="block w-full text-left px-4 py-3 rounded-lg transition duration-200 font-semibold text-sm bg-gray-50 text-gray-700 hover:bg-gray-100">
 								⚙️ Settings
 							</button>
+							<button
+								onClick={() => {
+									setView("cloud-sync");
+									setMobileNavOpen(false);
+								}}
+								className="block w-full text-left px-4 py-3 rounded-lg transition duration-200 font-semibold text-sm bg-gray-50 text-gray-700 hover:bg-gray-100">
+								☁️ Cloud Sync
+							</button>
 						</div>
 					</nav>
 				</div>
@@ -220,7 +247,9 @@ function AppContent() {
 					<CompanionHub
 						onQuestNavigate={(section) => {
 							// Convert quest activity names to view names
-							const viewMap: { [key: string]: ViewType } = {							task: "home",								meal: "meals",
+							const viewMap: { [key: string]: ViewType } = {
+								task: "home",
+								meal: "meals",
 								activity: "activity",
 								journal: "journal",
 								weight: "progress",
@@ -272,6 +301,18 @@ function AppContent() {
 							}}
 						/>
 					</>
+				) : view === "cloud-sync" ? (
+					<>
+						<div className="mb-8">
+							<button
+								onClick={() => setView("results")}
+								className="flex items-center space-x-2 px-4 py-2 rounded-lg transition duration-200 font-medium text-blue-600 hover:bg-blue-50">
+								<span>←</span>
+								<span>Back</span>
+							</button>
+						</div>
+						<CloudSyncSettings />
+					</>
 				) : null}
 			</main>
 		</div>
@@ -280,9 +321,11 @@ function AppContent() {
 
 function App() {
 	return (
-		<UserProvider>
-			<AppContent />
-		</UserProvider>
+		<GoogleOAuthProvider clientId="689747181648-p6sq7e9lmme2n0fqb0oo5v8htt90r5no.apps.googleusercontent.com">
+			<UserProvider>
+				<AppContent />
+			</UserProvider>
+		</GoogleOAuthProvider>
 	);
 }
 
