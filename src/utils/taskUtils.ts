@@ -155,15 +155,20 @@ export const checkTaskQuests = (
  * Generate initial task-based quests for a user
  */
 export const generateTaskQuests = (userId: string): Quest[] => {
-	const tomorrow = new Date();
+	const today = new Date();
+	today.setHours(23, 59, 59, 999);
+	
+	const tomorrow = new Date(today);
 	tomorrow.setDate(tomorrow.getDate() + 1);
-	tomorrow.setHours(23, 59, 59, 999);
+	
+	const weekFromNow = new Date(today);
+	weekFromNow.setDate(weekFromNow.getDate() + 7);
 
 	return [
 		{
 			id: `quest-morning-${Date.now()}`,
 			userId,
-			title: "Morning Champion",
+			title: "🌅 Morning Champion",
 			description: "Complete 5 morning routine tasks",
 			type: "task-chain",
 			linkedActivity: "task",
@@ -179,7 +184,7 @@ export const generateTaskQuests = (userId: string): Quest[] => {
 		{
 			id: `quest-progression-${Date.now()}`,
 			userId,
-			title: "Progressive Warrior",
+			title: "⚡ Progressive Warrior",
 			description: "Complete a progression chain (10→20→40 reps)",
 			type: "task-chain",
 			linkedActivity: "task",
@@ -188,12 +193,12 @@ export const generateTaskQuests = (userId: string): Quest[] => {
 			rewardPoints: 100,
 			rewardXP: 150,
 			completed: false,
-			expiresAt: tomorrow,
+			expiresAt: weekFromNow,
 		},
 		{
 			id: `quest-anytime-${Date.now()}`,
 			userId,
-			title: "Task Master",
+			title: "🎯 Task Master",
 			description: "Complete 10 anytime tasks in a day",
 			type: "task-chain",
 			linkedActivity: "task",
@@ -205,6 +210,22 @@ export const generateTaskQuests = (userId: string): Quest[] => {
 			rewardXP: 120,
 			completed: false,
 			expiresAt: tomorrow,
+		},
+		{
+			id: `quest-week-warrior-${Date.now()}`,
+			userId,
+			title: "⭐ Week Warrior",
+			description: "Complete anytime tasks 7 days in a row",
+			type: "task-chain",
+			linkedActivity: "task",
+			taskCategory: "anytime",
+			requiredTaskCompletions: 1,
+			targetCount: 7,
+			currentProgress: 0,
+			rewardPoints: 150,
+			rewardXP: 200,
+			completed: false,
+			expiresAt: weekFromNow,
 		},
 	];
 };

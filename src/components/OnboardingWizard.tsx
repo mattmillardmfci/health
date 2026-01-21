@@ -137,207 +137,209 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onCompleted,
 					</div>
 
 					{/* Steps */}
-					{step === 0 && (
-						<div className="animate-slide-in">
-							<h2 className="text-2xl font-bold text-slate-800 mb-2">Welcome! 👋</h2>
-							<p className="text-slate-600 mb-6">Let's get to know you first.</p>
+					<div className="flex flex-col items-center">
+						{step === 0 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-2xl font-bold text-slate-800 mb-2 text-center">Welcome! 👋</h2>
+								<p className="text-slate-600 mb-6 text-center">Let's get to know you first.</p>
 
-							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-2">What's your name?</label>
-								<input
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									onKeyPress={(e) => {
-										if (e.key === "Enter" && name.trim()) next();
-									}}
-									placeholder="e.g., Matt"
-									className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
-									autoFocus
-								/>
-							</div>
-
-							{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
-							<div className="mt-6 flex justify-end">
-								<button
-									onClick={next}
-									disabled={!name.trim()}
-									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed">
-									Next
-								</button>
-							</div>
-						</div>
-					)}
-
-					{step === 1 && (
-						<div className="animate-slide-in">
-							<h2 className="text-xl font-bold text-slate-800 mb-4">Age Range</h2>
-							<div className="space-y-3">
-								{[
-									{ label: "13-17", value: "13-17" },
-									{ label: "18-24", value: "18-24" },
-									{ label: "25-34", value: "25-34" },
-									{ label: "35-44", value: "35-44" },
-									{ label: "45-54", value: "45-54" },
-									{ label: "55-64", value: "55-64" },
-									{ label: "65+", value: "65+" },
-								].map((opt) => (
-									<button
-										key={opt.value}
-										onClick={() => {
-											setAgeRange(opt.value);
-											next();
+								<div className="w-full max-w-xs mx-auto">
+									<label className="block text-sm font-semibold text-slate-700 mb-2 text-center">What's your name?</label>
+									<input
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+										onKeyPress={(e) => {
+											if (e.key === "Enter" && name.trim()) next();
 										}}
-										className={`w-full text-left px-4 py-3 rounded-xl border shadow-sm transition ${
-											ageRange === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
-										}`}>
-										{opt.label}
-									</button>
-								))}
-							</div>
-							<div className="mt-6 flex justify-start">
-								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
-									Back
-								</button>
-							</div>
-						</div>
-					)}
+										placeholder="e.g., Matt"
+										className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
+										autoFocus
+									/>
+								</div>
 
-					{step === 2 && (
-						<div className="animate-slide-in">
-							<h2 className="text-xl font-bold text-slate-800 mb-4">Gender</h2>
-							<div className="grid grid-cols-3 gap-3">
-								{[
-									{ label: "Male", value: "male" },
-									{ label: "Female", value: "female" },
-									{ label: "Other", value: "other" },
-								].map((opt) => (
+								{error && <div className="mt-3 text-sm text-rose-600 text-center">{error}</div>}
+								<div className="mt-6 flex justify-end w-full">
 									<button
-										key={opt.value}
-										onClick={() => {
-											setGender(opt.value as any);
-											next();
+										onClick={next}
+										disabled={!name.trim()}
+										className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed">
+										Next
+									</button>
+								</div>
+							</div>
+						)}
+
+						{step === 1 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-xl font-bold text-slate-800 mb-4 text-center">Age Range</h2>
+								<div className="w-full max-w-xs mx-auto space-y-3">
+									{[
+										{ label: "13-17", value: "13-17" },
+										{ label: "18-24", value: "18-24" },
+										{ label: "25-34", value: "25-34" },
+										{ label: "35-44", value: "35-44" },
+										{ label: "45-54", value: "45-54" },
+										{ label: "55-64", value: "55-64" },
+										{ label: "65+", value: "65+" },
+									].map((opt) => (
+										<button
+											key={opt.value}
+											onClick={() => {
+												setAgeRange(opt.value);
+												next();
+											}}
+											className={`w-full text-left px-4 py-3 rounded-xl border shadow-sm transition ${
+												ageRange === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
+											}`}>
+											{opt.label}
+										</button>
+									))}
+								</div>
+								<div className="mt-6 flex justify-start w-full">
+									<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+										Back
+									</button>
+								</div>
+							</div>
+						)}
+
+						{step === 2 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-xl font-bold text-slate-800 mb-4 text-center">Gender</h2>
+								<div className="flex justify-center gap-3">
+									{[
+										{ label: "Male", value: "male" },
+										{ label: "Female", value: "female" },
+										{ label: "Other", value: "other" },
+									].map((opt) => (
+										<button
+											key={opt.value}
+											onClick={() => {
+												setGender(opt.value as any);
+												next();
+											}}
+											className={`px-4 py-3 rounded-xl border shadow-sm transition ${
+												gender === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
+											}`}>
+											{opt.label}
+										</button>
+									))}
+								</div>
+								<div className="mt-6 flex justify-start w-full">
+									<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+										Back
+									</button>
+								</div>
+							</div>
+						)}
+
+						{step === 3 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-xl font-bold text-slate-800 mb-4 text-center">Energy & Activity</h2>
+								<div className="w-full max-w-xs mx-auto space-y-3">
+									{[
+										{ label: "I'm on the move most of the day", value: "very_active" },
+										{ label: "I balance stationary with some movement", value: "moderately_active" },
+										{ label: "I don't move much and want to be more active", value: "lightly_active" },
+										{ label: "I have conditions that limit movement", value: "sedentary" },
+									].map((opt) => (
+										<button
+											key={opt.value}
+											onClick={() => {
+												setActivity(opt.value as any);
+												next();
+											}}
+											className={`w-full text-left px-4 py-3 rounded-xl border shadow-sm transition ${
+												activity === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
+											}`}>
+											{opt.label}
+										</button>
+									))}
+								</div>
+								<div className="mt-6 flex justify-start w-full">
+									<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+										Back
+									</button>
+								</div>
+							</div>
+						)}
+
+						{step === 4 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-xl font-bold text-slate-800 mb-2 text-center">What Would Help You Most?</h2>
+								<p className="text-slate-600 mb-4 text-center">
+									Choose areas where you'd like support. We'll personalize your tasks.
+								</p>
+								<div className="w-full max-w-xs mx-auto grid grid-cols-2 gap-3">
+									{[
+										"Be more active",
+										"Sleep better",
+										"Stay fresh and clean",
+										"Build healthy eating habits",
+										"Manage stress",
+										"Get more organized",
+									].map((area) => (
+										<button
+											key={area}
+											onClick={() => toggleSupportArea(area)}
+											className={`px-3 py-3 rounded-xl text-sm border shadow-sm transition ${
+												supportAreas.includes(area) ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
+											}`}>
+											{area}
+										</button>
+									))}
+								</div>
+								<div className="mt-6 flex justify-between w-full">
+									<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+										Back
+									</button>
+									<button
+										onClick={next}
+										className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600">
+										Next
+									</button>
+								</div>
+							</div>
+						)}
+
+						{step === 5 && (
+							<div className="animate-slide-in w-full">
+								<h2 className="text-2xl font-bold text-slate-800 mb-2 text-center">Now, let's create your cub! 🐻‍❄️</h2>
+								<p className="text-slate-600 mb-6 text-center">Name your polar bear companion who will grow with you.</p>
+
+								<div className="w-full max-w-xs mx-auto">
+									<label className="block text-sm font-semibold text-slate-700 mb-2 text-center">Cub's Name</label>
+									<input
+										value={cubName}
+										onChange={(e) => setCubName(e.target.value)}
+										onKeyPress={(e) => {
+											if (e.key === "Enter" && cubName.trim()) createUser();
 										}}
-										className={`px-4 py-3 rounded-xl border shadow-sm transition ${
-											gender === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
-										}`}>
-										{opt.label}
-									</button>
-								))}
-							</div>
-							<div className="mt-6 flex justify-start">
-								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
-									Back
-								</button>
-							</div>
-						</div>
-					)}
+										placeholder="e.g., Snowy"
+										className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
+										autoFocus
+									/>
+								</div>
 
-					{step === 3 && (
-						<div className="animate-slide-in">
-							<h2 className="text-xl font-bold text-slate-800 mb-4">Energy & Activity</h2>
-							<div className="space-y-3">
-								{[
-									{ label: "I'm on the move most of the day", value: "very_active" },
-									{ label: "I balance stationary with some movement", value: "moderately_active" },
-									{ label: "I don't move much and want to be more active", value: "lightly_active" },
-									{ label: "I have conditions that limit movement", value: "sedentary" },
-								].map((opt) => (
+								<p className="text-sm text-slate-600 mt-4 text-center">
+									Your cub will level up as you complete tasks and reach your goals.
+								</p>
+
+								{error && <div className="mt-3 text-sm text-rose-600 text-center">{error}</div>}
+								<div className="mt-6 flex justify-between w-full">
+									<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
+										Back
+									</button>
 									<button
-										key={opt.value}
-										onClick={() => {
-											setActivity(opt.value as any);
-											next();
-										}}
-										className={`w-full text-left px-4 py-3 rounded-xl border shadow-sm transition ${
-											activity === opt.value ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
-										}`}>
-										{opt.label}
+										onClick={createUser}
+										disabled={!cubName.trim()}
+										className="px-4 py-2 rounded-lg bg-emerald-600 text-white shadow hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+										Create & Begin
 									</button>
-								))}
+								</div>
 							</div>
-							<div className="mt-6 flex justify-start">
-								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
-									Back
-								</button>
-							</div>
-						</div>
-					)}
-
-					{step === 4 && (
-						<div className="animate-slide-in">
-							<h2 className="text-xl font-bold text-slate-800 mb-2">What Would Help You Most?</h2>
-							<p className="text-slate-600 mb-4">
-								Choose areas where you'd like support. We'll personalize your tasks.
-							</p>
-							<div className="grid grid-cols-2 gap-3">
-								{[
-									"Be more active",
-									"Sleep better",
-									"Stay fresh and clean",
-									"Build healthy eating habits",
-									"Manage stress",
-									"Get more organized",
-								].map((area) => (
-									<button
-										key={area}
-										onClick={() => toggleSupportArea(area)}
-										className={`px-3 py-3 rounded-xl text-sm border shadow-sm transition ${
-											supportAreas.includes(area) ? "bg-emerald-50 border-emerald-300" : "bg-white border-slate-300"
-										}`}>
-										{area}
-									</button>
-								))}
-							</div>
-							<div className="mt-6 flex justify-between">
-								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
-									Back
-								</button>
-								<button
-									onClick={next}
-									className="px-4 py-2 rounded-lg bg-emerald-500 text-white shadow hover:bg-emerald-600">
-									Next
-								</button>
-							</div>
-						</div>
-					)}
-
-					{step === 5 && (
-						<div className="animate-slide-in">
-							<h2 className="text-2xl font-bold text-slate-800 mb-2">Now, let's create your cub! 🐻‍❄️</h2>
-							<p className="text-slate-600 mb-6">Name your polar bear companion who will grow with you.</p>
-
-							<div>
-								<label className="block text-sm font-semibold text-slate-700 mb-2">Cub's Name</label>
-								<input
-									value={cubName}
-									onChange={(e) => setCubName(e.target.value)}
-									onKeyPress={(e) => {
-										if (e.key === "Enter" && cubName.trim()) createUser();
-									}}
-									placeholder="e.g., Snowy"
-									className="w-full px-4 py-3 rounded-xl border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-400"
-									autoFocus
-								/>
-							</div>
-
-							<p className="text-sm text-slate-600 mt-4">
-								Your cub will level up as you complete tasks and reach your goals.
-							</p>
-
-							{error && <div className="mt-3 text-sm text-rose-600">{error}</div>}
-							<div className="mt-6 flex justify-between">
-								<button onClick={back} className="px-4 py-2 rounded-lg bg-white border shadow">
-									Back
-								</button>
-								<button
-									onClick={createUser}
-									disabled={!cubName.trim()}
-									className="px-4 py-2 rounded-lg bg-emerald-600 text-white shadow hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
-									Create & Begin
-								</button>
-							</div>
-						</div>
-					)}
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

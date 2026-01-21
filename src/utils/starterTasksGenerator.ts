@@ -62,6 +62,16 @@ export const generateStarterTasks = (config: StarterTasksConfig): Task[] => {
 	const anytimeTasks: Omit<Task, "id">[] = [
 		{
 			userId: "",
+			title: "Do 10 pushups",
+			description: "Build strength with a simple bodyweight exercise 💪",
+			category: "anytime",
+			isRecurring: false,
+			progressionValue: 10,
+			completed: false,
+			reward: 20,
+		},
+		{
+			userId: "",
 			title: "Take a stretch break",
 			description: "Move your body and feel the tension release 🧘",
 			category: "anytime",
